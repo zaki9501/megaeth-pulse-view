@@ -1,11 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Header } from "@/components/dashboard/Header";
+import { ChainOpsOverview } from "@/components/dashboard/ChainOpsOverview";
+import { DAppLeaderboard } from "@/components/dashboard/DAppLeaderboard";
+import { WhaleTracker } from "@/components/dashboard/WhaleTracker";
+import { DeveloperTools } from "@/components/dashboard/DeveloperTools";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("chain-ops");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "chain-ops":
+        return <ChainOpsOverview />;
+      case "leaderboard":
+        return <DAppLeaderboard />;
+      case "whale-tracker":
+        return <WhaleTracker />;
+      case "dev-tools":
+        return <DeveloperTools />;
+      default:
+        return <ChainOpsOverview />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-900 text-white flex w-full">
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
+      />
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+        <Header />
+        <main className="flex-1 p-6 overflow-y-auto">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );
