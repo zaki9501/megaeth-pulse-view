@@ -15,7 +15,8 @@ interface BlockData {
   timestamp: number;
   gasUsed: string;
   gasLimit: string;
-  transactions: any[];
+  transactions: string[]; // Changed from any[] to string[] since we get hashes only
+  transactionCount: number;
 }
 
 export const useMegaETHData = () => {
@@ -42,7 +43,7 @@ export const useMegaETHData = () => {
       const gasPriceWei = await megaethAPI.getGasPrice();
       const gasPriceGwei = megaethAPI.weiToGwei(gasPriceWei);
       
-      // Fetch latest block details
+      // Fetch latest block details (without full transaction details)
       const latestBlock = await megaethAPI.getBlock('latest');
       
       // Calculate block time (simplified - using timestamp difference)
@@ -52,14 +53,14 @@ export const useMegaETHData = () => {
         blockTime = (parseInt(latestBlock.timestamp, 16) - lastBlock.timestamp) * 1000; // Convert to ms
       }
       
-      // Calculate TPS (transactions per second based on latest block)
-      const tps = latestBlock.transactions ? latestBlock.transactions.length : 0;
+      // Calculate TPS (transaction count based on latest block)
+      const transactionCount = latestBlock.transactions ? latestBlock.transactions.length : 0;
       
       setChainMetrics({
         blockHeight: currentBlock,
         blockTime: blockTime || 50, // Default to 50ms if no previous data
         gasPrice: gasPriceGwei,
-        tps: tps,
+        tps: transactionCount, // This represents transactions per block, not per second
         lastUpdated: new Date()
       });
 
@@ -67,12 +68,19 @@ export const useMegaETHData = () => {
       const newBlockData: BlockData = {
         number: parseInt(latestBlock.number, 16),
         timestamp: parseInt(latestBlock.timestamp, 16),
-        gasUsed: latestBlock.gasUsed,
-        gasLimit: latestBlock.gasLimit,
-        transactions: latestBlock.transactions || []
+        gasUsed: latestBlock.gasUsed || '0x0',
+        gasLimit: latestBlock.gasLimit || '0x0',
+        transactions: latestBlock.transactions || [],
+        transactionCount: transactionCount
       };
 
       setRecentBlocks(prev => {
+        // Check if this block is already in our list to avoid duplicates
+        const blockExists = prev.some(block => block.number === newBlockData.number);
+        if (blockExists) {
+          return prev;
+        }
+        
         const updated = [...prev, newBlockData].slice(-20); // Keep last 20 blocks
         return updated;
       });

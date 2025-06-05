@@ -9,7 +9,8 @@ interface LiveChartProps {
     timestamp: number;
     gasUsed: string;
     gasLimit: string;
-    transactions: any[];
+    transactions: string[];
+    transactionCount: number;
   }>;
 }
 
@@ -32,8 +33,8 @@ export const LiveChart = ({ type, data = [] }: LiveChartProps) => {
       let value: number;
       
       if (type === "tps") {
-        // Calculate TPS (transactions in this block)
-        value = block.transactions.length;
+        // Calculate transaction count (since we get hashes, not full transactions)
+        value = block.transactionCount || block.transactions.length;
       } else {
         // Calculate gas usage percentage
         const gasUsed = parseInt(block.gasUsed, 16);

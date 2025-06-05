@@ -42,7 +42,7 @@ export const ChainOpsOverview = () => {
       change: "+2.4%" 
     },
     { 
-      title: "TPS", 
+      title: "Transactions", 
       value: chainMetrics.tps.toString(), 
       icon: Activity, 
       change: "+15.7%" 
@@ -109,7 +109,8 @@ export const ChainOpsOverview = () => {
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <AlertCircle className="text-red-400" size={20} />
-              <span className="text-red-400">Failed to connect to MegaETH RPC: {error}</span>
+              <span className="text-red-400">MegaETH RPC Issue: {error}</span>
+              <span className="text-gray-400 text-sm ml-2">(Some features may use mock data)</span>
             </div>
           </CardContent>
         </Card>
@@ -143,7 +144,7 @@ export const ChainOpsOverview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Transactions Per Second</CardTitle>
+            <CardTitle>Transactions Per Block</CardTitle>
           </CardHeader>
           <CardContent>
             <LiveChart type="tps" data={recentBlocks} />
@@ -199,7 +200,7 @@ export const ChainOpsOverview = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                   <span className="font-mono text-sm">#{block.number}</span>
-                  <span className="text-gray-400 text-sm">{block.transactions.length} txs</span>
+                  <span className="text-gray-400 text-sm">{block.transactionCount} txs</span>
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold">

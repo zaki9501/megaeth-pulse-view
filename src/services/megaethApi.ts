@@ -69,9 +69,16 @@ class MegaETHAPI {
     return result;
   }
 
+  // Modified to request block without full transaction details to avoid "full block not allowed" error
   async getBlock(blockNumber: string | number = 'latest'): Promise<any> {
     const blockParam = typeof blockNumber === 'number' ? `0x${blockNumber.toString(16)}` : blockNumber;
-    return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, true]);
+    return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, false]); // Changed from true to false
+  }
+
+  // New method to get block with transaction hashes only
+  async getBlockWithTransactionHashes(blockNumber: string | number = 'latest'): Promise<any> {
+    const blockParam = typeof blockNumber === 'number' ? `0x${blockNumber.toString(16)}` : blockNumber;
+    return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, false]);
   }
 
   async getTransactionCount(address: string, blockTag: string = 'latest'): Promise<number> {
