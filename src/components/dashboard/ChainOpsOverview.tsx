@@ -13,7 +13,11 @@ export const ChainOpsOverview = () => {
     { title: "TPS", value: "8,543", icon: Activity, change: "+15.7%" },
   ];
 
-  const systemStatus = [
+  const systemStatus: Array<{
+    label: string;
+    status: "online" | "good" | "warning" | "error" | "syncing";
+    value: string;
+  }> = [
     { label: "Sequencer Uptime", status: "online", value: "99.98%" },
     { label: "Latency Status", status: "good", value: "12ms" },
     { label: "L2→L1 Sync", status: "syncing", value: "5.2s" },
