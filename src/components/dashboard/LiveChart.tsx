@@ -39,6 +39,8 @@ export const LiveChart = ({ type, data = [] }: LiveChartProps) => {
         const value = Math.floor(Math.random() * variance) + baseValue;
         const prevValue = i > 0 ? baseValue + (Math.random() * variance) : value;
         
+        const trend: "up" | "down" | "stable" = value > prevValue ? "up" : value < prevValue ? "down" : "stable";
+        
         return {
           time: i,
           value,
@@ -47,7 +49,7 @@ export const LiveChart = ({ type, data = [] }: LiveChartProps) => {
           gasUsed: type === "gas" ? Math.floor(value * 300000) : undefined,
           gasLimit: type === "gas" ? 30000000 : undefined,
           efficiency: type === "gas" ? value : Math.floor(Math.random() * 20) + 80,
-          trend: value > prevValue ? "up" : value < prevValue ? "down" : "stable"
+          trend
         };
       });
       setChartData(mockData);
@@ -74,6 +76,8 @@ export const LiveChart = ({ type, data = [] }: LiveChartProps) => {
         ((parseInt(data[index - 1]?.gasUsed || "0", 16) / parseInt(data[index - 1]?.gasLimit || "1", 16)) * 100)
       ) : value;
 
+      const trend: "up" | "down" | "stable" = value > prevValue ? "up" : value < prevValue ? "down" : "stable";
+
       return {
         time: index,
         value: Math.round(value),
@@ -82,7 +86,7 @@ export const LiveChart = ({ type, data = [] }: LiveChartProps) => {
         gasUsed: parseInt(block.gasUsed, 16),
         gasLimit: parseInt(block.gasLimit, 16),
         efficiency: Math.round(efficiency),
-        trend: value > prevValue ? "up" : value < prevValue ? "down" : "stable"
+        trend
       };
     });
 

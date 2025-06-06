@@ -1,13 +1,16 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Zap, Clock, TrendingUp, Activity, Database, CheckCircle, AlertCircle } from "lucide-react";
+import { Zap, Clock, TrendingUp, Activity, Database, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
 import { MetricCard } from "./MetricCard";
 import { LiveChart } from "./LiveChart";
 import { StatusIndicator } from "./StatusIndicator";
+import { TransactionDetails } from "./TransactionDetails";
 import { useMegaETHData } from "@/hooks/useMegaETHData";
+import { useState } from "react";
 
 export const ChainOpsOverview = () => {
   const { chainMetrics, recentBlocks, isLoading, error, refetch } = useMegaETHData();
+  const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
+  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
 
   // Format metrics for display
   const formatBlockHeight = (height: number) => {
@@ -70,6 +73,16 @@ export const ChainOpsOverview = () => {
       value: "5.2s" 
     },
   ];
+
+  const handleTransactionClick = (transactionHash: string) => {
+    setSelectedTransaction(transactionHash);
+    setShowTransactionDetails(true);
+  };
+
+  const closeTransactionDetails = () => {
+    setShowTransactionDetails(false);
+    setSelectedTransaction(null);
+  };
 
   if (isLoading) {
     return (
@@ -188,33 +201,58 @@ export const ChainOpsOverview = () => {
         </CardContent>
       </Card>
 
-      {/* Recent Blocks */}
+      {/* Recent Transactions */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle>Recent Blocks</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Recent Transactions</span>
+            <span className="text-sm text-gray-400">Click on a transaction to view details</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-80 overflow-y-auto">
-            {recentBlocks.slice(-10).reverse().map((block, index) => (
-              <div key={block.number} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <span className="font-mono text-sm">#{block.number}</span>
-                  <span className="text-gray-400 text-sm">{block.transactionCount} txs</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold">
-                    Gas: {parseInt(block.gasUsed, 16).toLocaleString()}
+            {recentBlocks.slice(-10).reverse().map((block, blockIndex) => (
+              <div key={block.number} className="space-y-2">
+                <div className="text-sm text-gray-400 font-semibold">Block #{block.number}</div>
+                {block.transactions.slice(0, 3).map((txHash, txIndex) => (
+                  <div 
+                    key={txHash} 
+                    className="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-colors group"
+                    onClick={() => handleTransactionClick(txHash)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span className="font-mono text-sm text-blue-400 group-hover:text-blue-300">
+                        {txHash.slice(0, 10)}...{txHash.slice(-8)}
+                      </span>
+                      <ExternalLink className="text-gray-400 group-hover:text-gray-300" size={14} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400">
+                        {new Date(block.timestamp * 1000).toLocaleTimeString()}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {new Date(block.timestamp * 1000).toLocaleTimeString()}
+                ))}
+                {block.transactions.length > 3 && (
+                  <div className="text-center text-sm text-gray-400 py-2">
+                    +{block.transactions.length - 3} more transactions
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Transaction Details Modal */}
+      {selectedTransaction && (
+        <TransactionDetails
+          transactionHash={selectedTransaction}
+          isOpen={showTransactionDetails}
+          onClose={closeTransactionDetails}
+        />
+      )}
     </div>
   );
 };
