@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { ChainOpsOverview } from "@/components/dashboard/ChainOpsOverview";
@@ -10,6 +11,15 @@ import { DeveloperTools } from "@/components/dashboard/DeveloperTools";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("chain-ops");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleTabChange = (tab: string) => {
+    if (tab === "portfolio") {
+      navigate("/portfolio");
+    } else {
+      setActiveTab(tab);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -30,7 +40,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-900 text-white flex w-full">
       <Sidebar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
       />

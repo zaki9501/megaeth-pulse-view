@@ -1,0 +1,80 @@
+
+import { useState } from "react";
+import { Header } from "@/components/dashboard/Header";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { WalletPortfolio } from "@/components/portfolio/WalletPortfolio";
+import { TransactionHistory } from "@/components/portfolio/TransactionHistory";
+import { WalletSearch } from "@/components/portfolio/WalletSearch";
+
+const Portfolio = () => {
+  const [activeTab, setActiveTab] = useState("portfolio");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<string>("");
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "portfolio":
+        return <WalletPortfolio walletAddress={selectedWallet} />;
+      case "transactions":
+        return <TransactionHistory walletAddress={selectedWallet} />;
+      default:
+        return <WalletPortfolio walletAddress={selectedWallet} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex w-full">
+      <Sidebar 
+        activeTab="portfolio" 
+        setActiveTab={() => {}}
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
+      />
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+        <Header />
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Portfolio Explorer</h1>
+            </div>
+
+            {/* Wallet Search */}
+            <WalletSearch 
+              onWalletSelect={setSelectedWallet}
+              selectedWallet={selectedWallet}
+            />
+
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg w-fit">
+              <button
+                onClick={() => setActiveTab("portfolio")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "portfolio"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                }`}
+              >
+                Portfolio
+              </button>
+              <button
+                onClick={() => setActiveTab("transactions")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "transactions"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                }`}
+              >
+                Transaction History
+              </button>
+            </div>
+
+            {/* Content */}
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Portfolio;
