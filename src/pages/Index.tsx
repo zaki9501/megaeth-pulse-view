@@ -16,6 +16,8 @@ const Index = () => {
   const handleTabChange = (tab: string) => {
     if (tab === "portfolio") {
       navigate("/portfolio");
+    } else if (tab === "contract-tools") {
+      navigate("/contract-tools");
     } else {
       setActiveTab(tab);
     }

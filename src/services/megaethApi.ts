@@ -1,4 +1,3 @@
-
 interface RPCRequest {
   jsonrpc: string;
   method: string;
@@ -69,13 +68,11 @@ class MegaETHAPI {
     return result;
   }
 
-  // Modified to request block without full transaction details to avoid "full block not allowed" error
   async getBlock(blockNumber: string | number = 'latest'): Promise<any> {
     const blockParam = typeof blockNumber === 'number' ? `0x${blockNumber.toString(16)}` : blockNumber;
-    return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, false]); // Changed from true to false
+    return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, false]);
   }
 
-  // New method to get block with transaction hashes only
   async getBlockWithTransactionHashes(blockNumber: string | number = 'latest'): Promise<any> {
     const blockParam = typeof blockNumber === 'number' ? `0x${blockNumber.toString(16)}` : blockNumber;
     return await this.makeRPCCall('eth_getBlockByNumber', [blockParam, false]);
@@ -92,6 +89,27 @@ class MegaETHAPI {
 
   async getTransactionReceipt(hash: string): Promise<any> {
     return await this.makeRPCCall('eth_getTransactionReceipt', [hash]);
+  }
+
+  async getCode(address: string, blockTag: string = 'latest'): Promise<string> {
+    return await this.makeRPCCall<string>('eth_getCode', [address, blockTag]);
+  }
+
+  async getStorageAt(address: string, position: string, blockTag: string = 'latest'): Promise<string> {
+    return await this.makeRPCCall<string>('eth_getStorageAt', [address, position, blockTag]);
+  }
+
+  async call(transaction: any, blockTag: string = 'latest'): Promise<string> {
+    return await this.makeRPCCall<string>('eth_call', [transaction, blockTag]);
+  }
+
+  async estimateGas(transaction: any): Promise<string> {
+    return await this.makeRPCCall<string>('eth_estimateGas', [transaction]);
+  }
+
+  async isContract(address: string): Promise<boolean> {
+    const code = await this.getCode(address);
+    return code !== '0x' && code.length > 2;
   }
 
   // Helper method to convert Wei to Ether
