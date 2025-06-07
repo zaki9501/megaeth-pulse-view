@@ -10,6 +10,7 @@ import { GasFlameChart } from "./GasFlameChart";
 import { NetworkMap } from "./NetworkMap";
 import { HologramCard } from "./HologramCard";
 import { TransactionLog } from "./TransactionLog";
+import { megaethAPI } from "@/services/megaethApi";
 
 interface WalletData {
   address: string;
@@ -30,18 +31,33 @@ export const WalletVisualizer = () => {
     if (!walletAddress) return;
     
     setIsScanning(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Get wallet balance
+      const balanceWei = await megaethAPI.getBalance(walletAddress);
+      const balance = megaethAPI.weiToEther(balanceWei);
+      
+      // Get transaction count
+      const txCount = await megaethAPI.getTransactionCount(walletAddress);
+      
+      // Check if it's a contract
+      const isContract = await megaethAPI.isContract(walletAddress);
+      
+      // Calculate estimated gas usage (simplified calculation)
+      const estimatedGasUsed = txCount * 21000; // Basic estimation
+      
       setWalletData({
         address: walletAddress,
-        balance: "2.847",
-        gasUsed: 1420000,
-        txCount: 47,
-        rank: 4,
-        isActive: true
+        balance: balance.toFixed(4),
+        gasUsed: estimatedGasUsed,
+        txCount: txCount,
+        rank: Math.floor(Math.random() * 100) + 1, // Mock rank for now
+        isActive: txCount > 0
       });
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+    } finally {
       setIsScanning(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -55,9 +71,9 @@ export const WalletVisualizer = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                TRANSACTION VISUALIZER
+                MEGAETH TRANSACTION VISUALIZER
               </h1>
-              <p className="text-gray-400 text-sm font-mono">NEURAL NETWORK ANALYSIS TERMINAL</p>
+              <p className="text-gray-400 text-sm font-mono">REAL-TIME BLOCKCHAIN ANALYSIS</p>
             </div>
           </div>
           
