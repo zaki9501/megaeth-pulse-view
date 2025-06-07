@@ -1,21 +1,79 @@
 
 import { useState, useEffect } from "react";
 import { Flame, TrendingUp } from "lucide-react";
+import { megaethAPI } from "@/services/megaethApi";
 
 interface GasFlameChartProps {
   gasData: number;
+  walletAddress?: string;
 }
 
-export const GasFlameChart = ({ gasData }: GasFlameChartProps) => {
+export const GasFlameChart = ({ gasData, walletAddress }: GasFlameChartProps) => {
   const [flameHeight, setFlameHeight] = useState(0);
   const [gasHistory, setGasHistory] = useState<number[]>([]);
+  const [realTimeGasUsed, setRealTimeGasUsed] = useState(0);
+
+  useEffect(() => {
+    const fetchGasData = async () => {
+      if (!walletAddress) return;
+      
+      try {
+        const currentBlock = await megaethAPI.getBlockNumber();
+        let totalGasUsed = 0;
+        const gasDataPoints: number[] = [];
+        
+        // Check last 6 blocks for gas usage
+        for (let i = 0; i < 6; i++) {
+          const blockNum = currentBlock - i;
+          let blockGasUsed = 0;
+          
+          try {
+            const block = await megaethAPI.getBlock(blockNum);
+            
+            if (block && block.transactions) {
+              for (const txHash of block.transactions.slice(0, 5)) {
+                try {
+                  const tx = await megaethAPI.getTransactionByHash(txHash);
+                  const receipt = await megaethAPI.getTransactionReceipt(txHash);
+                  
+                  if (tx && receipt && (tx.from?.toLowerCase() === walletAddress.toLowerCase() || 
+                                      tx.to?.toLowerCase() === walletAddress.toLowerCase())) {
+                    const gasUsed = parseInt(receipt.gasUsed || '0x5208', 16);
+                    blockGasUsed += gasUsed;
+                    totalGasUsed += gasUsed;
+                  }
+                } catch (error) {
+                  console.log(`Error fetching gas data for tx:`, error);
+                }
+              }
+            }
+          } catch (error) {
+            console.log(`Error fetching block for gas data:`, error);
+          }
+          
+          gasDataPoints.unshift(blockGasUsed);
+        }
+        
+        setRealTimeGasUsed(totalGasUsed);
+        setGasHistory(gasDataPoints);
+        
+        const intensity = Math.min((totalGasUsed / 1000000) * 100, 100);
+        setFlameHeight(intensity);
+      } catch (error) {
+        console.error('Error fetching gas data:', error);
+      }
+    };
+
+    fetchGasData();
+    
+    // Poll for new gas data every 10 seconds
+    const interval = setInterval(fetchGasData, 10000);
+    return () => clearInterval(interval);
+  }, [walletAddress]);
 
   useEffect(() => {
     const intensity = Math.min((gasData / 2000000) * 100, 100);
     setFlameHeight(intensity);
-
-    // Update gas history
-    setGasHistory(prev => [...prev.slice(-10), gasData]);
   }, [gasData]);
 
   const generateFlameParticles = () => {
@@ -32,6 +90,8 @@ export const GasFlameChart = ({ gasData }: GasFlameChartProps) => {
       />
     ));
   };
+
+  const displayGasData = realTimeGasUsed > 0 ? realTimeGasUsed : gasData;
 
   return (
     <div className="h-48 relative bg-gradient-to-t from-gray-900 to-gray-800 rounded-lg overflow-hidden">
@@ -55,9 +115,9 @@ export const GasFlameChart = ({ gasData }: GasFlameChartProps) => {
           <span className="text-orange-400 font-mono text-sm">GAS INTENSITY</span>
         </div>
         <div className="text-2xl font-bold text-white font-mono">
-          {(gasData / 1000000).toFixed(1)}M
+          {(displayGasData / 1000000).toFixed(1)}M
         </div>
-        <div className="text-xs text-gray-400">GWEI CONSUMED</div>
+        <div className="text-xs text-gray-400">GAS CONSUMED</div>
       </div>
 
       {/* Gas History Graph */}
@@ -67,7 +127,7 @@ export const GasFlameChart = ({ gasData }: GasFlameChartProps) => {
             <div
               key={index}
               className="bg-gradient-to-t from-orange-500 to-yellow-400 rounded-sm flex-1"
-              style={{ height: `${(gas / 2000000) * 100}%` }}
+              style={{ height: `${Math.max((gas / 100000) * 100, 5)}%` }}
             />
           ))}
         </div>

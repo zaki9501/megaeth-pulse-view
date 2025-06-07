@@ -159,7 +159,7 @@ export const WalletVisualizer = () => {
                     <CardTitle className="text-orange-400 font-mono">GAS CONSUMPTION</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <GasFlameChart gasData={walletData.gasUsed} />
+                    <GasFlameChart gasData={walletData.gasUsed} walletAddress={walletData.address} />
                   </CardContent>
                 </Card>
               </div>

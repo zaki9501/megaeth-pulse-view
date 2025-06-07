@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Circle, ArrowRight } from "lucide-react";
+import { megaethAPI } from "@/services/megaethApi";
 
 interface NetworkNode {
   id: string;
@@ -21,61 +22,139 @@ export const NetworkMap = ({ walletAddress }: NetworkMapProps) => {
   const [activeConnection, setActiveConnection] = useState<string | null>(null);
 
   useEffect(() => {
-    // Generate network nodes
-    const mockNodes: NetworkNode[] = [
-      {
-        id: 'center',
-        address: walletAddress,
-        x: 50,
-        y: 50,
-        type: 'wallet',
-        connections: ['node1', 'node2', 'node3', 'node4'],
-        txCount: 47
-      },
-      {
-        id: 'node1',
-        address: '0x742d35cc...8c5b',
-        x: 80,
-        y: 30,
-        type: 'contract',
-        connections: ['center'],
-        txCount: 12
-      },
-      {
-        id: 'node2',
-        address: '0x8ba1f109...9c4d',
-        x: 20,
-        y: 25,
-        type: 'wallet',
-        connections: ['center'],
-        txCount: 8
-      },
-      {
-        id: 'node3',
-        address: '0x1f9840a8...5ad5',
-        x: 75,
-        y: 75,
-        type: 'dex',
-        connections: ['center'],
-        txCount: 23
-      },
-      {
-        id: 'node4',
-        address: '0xa0b86991...d426',
-        x: 25,
-        y: 70,
-        type: 'contract',
-        connections: ['center'],
-        txCount: 5
+    const fetchNetworkData = async () => {
+      if (!walletAddress) return;
+      
+      try {
+        const currentBlock = await megaethAPI.getBlockNumber();
+        const connectedAddresses = new Map<string, { count: number; isContract: boolean }>();
+        
+        // Analyze last 10 blocks for network connections
+        for (let i = 0; i < 10; i++) {
+          const blockNum = currentBlock - i;
+          try {
+            const block = await megaethAPI.getBlock(blockNum);
+            
+            if (block && block.transactions) {
+              for (const txHash of block.transactions.slice(0, 3)) {
+                try {
+                  const tx = await megaethAPI.getTransactionByHash(txHash);
+                  
+                  if (tx && (tx.from?.toLowerCase() === walletAddress.toLowerCase() || 
+                           tx.to?.toLowerCase() === walletAddress.toLowerCase())) {
+                    
+                    const otherAddress = tx.from?.toLowerCase() === walletAddress.toLowerCase() ? tx.to : tx.from;
+                    
+                    if (otherAddress && otherAddress !== walletAddress.toLowerCase()) {
+                      const existing = connectedAddresses.get(otherAddress) || { count: 0, isContract: false };
+                      
+                      // Check if it's a contract (simplified check)
+                      const isContract = await megaethAPI.isContract(otherAddress);
+                      
+                      connectedAddresses.set(otherAddress, {
+                        count: existing.count + 1,
+                        isContract
+                      });
+                    }
+                  }
+                } catch (error) {
+                  console.log(`Error analyzing network transaction:`, error);
+                }
+              }
+            }
+          } catch (error) {
+            console.log(`Error fetching block for network:`, error);
+          }
+        }
+        
+        // Create network nodes from real data
+        const networkNodes: NetworkNode[] = [
+          {
+            id: 'center',
+            address: walletAddress,
+            x: 50,
+            y: 50,
+            type: 'wallet',
+            connections: [],
+            txCount: connectedAddresses.size
+          }
+        ];
+        
+        // Add connected addresses as nodes
+        const positions = [
+          { x: 80, y: 30 },
+          { x: 20, y: 25 },
+          { x: 75, y: 75 },
+          { x: 25, y: 70 },
+          { x: 85, y: 50 },
+          { x: 15, y: 50 }
+        ];
+        
+        let nodeIndex = 0;
+        for (const [address, data] of Array.from(connectedAddresses.entries()).slice(0, 6)) {
+          const pos = positions[nodeIndex] || { x: 50 + (nodeIndex * 10), y: 30 + (nodeIndex * 15) };
+          
+          networkNodes.push({
+            id: `node${nodeIndex + 1}`,
+            address: `${address.slice(0, 10)}...${address.slice(-4)}`,
+            x: pos.x,
+            y: pos.y,
+            type: data.isContract ? 'contract' : 'wallet',
+            connections: ['center'],
+            txCount: data.count
+          });
+          
+          networkNodes[0].connections.push(`node${nodeIndex + 1}`);
+          nodeIndex++;
+        }
+        
+        // Fallback to mock data if no real connections found
+        if (networkNodes.length === 1) {
+          const mockNodes: NetworkNode[] = [
+            {
+              id: 'center',
+              address: walletAddress,
+              x: 50,
+              y: 50,
+              type: 'wallet',
+              connections: ['node1', 'node2'],
+              txCount: 0
+            },
+            {
+              id: 'node1',
+              address: 'No connections',
+              x: 75,
+              y: 35,
+              type: 'wallet',
+              connections: ['center'],
+              txCount: 0
+            },
+            {
+              id: 'node2',
+              address: 'found yet',
+              x: 25,
+              y: 65,
+              type: 'wallet',
+              connections: ['center'],
+              txCount: 0
+            }
+          ];
+          setNodes(mockNodes);
+        } else {
+          setNodes(networkNodes);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching network data:', error);
       }
-    ];
+    };
 
-    setNodes(mockNodes);
+    fetchNetworkData();
 
     // Simulate active connections
     const interval = setInterval(() => {
-      const randomNode = mockNodes[Math.floor(Math.random() * mockNodes.length)];
-      setActiveConnection(randomNode.id);
+      const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+      setActiveConnection(randomNode?.id || null);
       
       setTimeout(() => setActiveConnection(null), 2000);
     }, 5000);
@@ -180,7 +259,7 @@ export const NetworkMap = ({ walletAddress }: NetworkMapProps) => {
       {/* Network stats */}
       <div className="absolute top-4 left-4 bg-gray-800/80 rounded-lg p-3 backdrop-blur-sm border border-green-500/30">
         <div className="text-green-400 font-mono text-sm mb-1">NETWORK NODES</div>
-        <div className="text-white font-bold text-lg">{nodes.length - 1}</div>
+        <div className="text-white font-bold text-lg">{Math.max(nodes.length - 1, 0)}</div>
         <div className="text-xs text-gray-400">CONNECTED</div>
       </div>
 
