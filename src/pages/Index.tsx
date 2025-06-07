@@ -1,27 +1,18 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import { ChainOpsOverview } from "@/components/dashboard/ChainOpsOverview";
 import { DAppLeaderboard } from "@/components/dashboard/DAppLeaderboard";
 import { WhaleTracker } from "@/components/dashboard/WhaleTracker";
+import { WalletPortfolio } from "@/components/portfolio/WalletPortfolio";
+import { ContractExplorer } from "@/components/contract/ContractExplorer";
+import { WalletVisualizer } from "@/components/visualizer/WalletVisualizer";
 import { DeveloperTools } from "@/components/dashboard/DeveloperTools";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("chain-ops");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
-
-  const handleTabChange = (tab: string) => {
-    if (tab === "portfolio") {
-      navigate("/portfolio");
-    } else if (tab === "contract-tools") {
-      navigate("/contract-tools");
-    } else {
-      setActiveTab(tab);
-    }
-  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -31,6 +22,12 @@ const Index = () => {
         return <DAppLeaderboard />;
       case "whale-tracker":
         return <WhaleTracker />;
+      case "portfolio":
+        return <WalletPortfolio />;
+      case "contract-tools":
+        return <ContractExplorer />;
+      case "visualizer":
+        return <WalletVisualizer />;
       case "dev-tools":
         return <DeveloperTools />;
       default:
@@ -39,16 +36,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex w-full">
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={handleTabChange}
+    <div className="min-h-screen bg-gray-900 text-white">
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
       />
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+      
+      <div
+        className={`transition-all duration-300 ${
+          sidebarCollapsed ? "ml-16" : "ml-64"
+        }`}
+      >
         <Header />
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="p-6">
           {renderContent()}
         </main>
       </div>

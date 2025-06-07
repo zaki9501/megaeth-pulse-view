@@ -1,5 +1,4 @@
-
-import { BarChart, Activity, Users, Settings, ChevronLeft, ChevronRight, User, Code } from "lucide-react";
+import { BarChart, Activity, Users, Settings, ChevronLeft, ChevronRight, User, Code, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -16,6 +15,7 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
     { id: "whale-tracker", label: "Wallet Tracker", icon: Users },
     { id: "portfolio", label: "Portfolio", icon: User },
     { id: "contract-tools", label: "Contract Tools", icon: Code },
+    { id: "visualizer", label: "Visualizer", icon: Eye },
     { id: "dev-tools", label: "Dev Tools", icon: Settings },
   ];
 
