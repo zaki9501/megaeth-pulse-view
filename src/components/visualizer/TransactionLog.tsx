@@ -19,58 +19,88 @@ interface TransactionLogProps {
   walletAddress: string;
 }
 
+// Rate limiting utility
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const TransactionLog = ({ walletAddress }: TransactionLogProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isScanning, setIsScanning] = useState(true);
+  const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!walletAddress) return;
+      if (!walletAddress || isScanning) return;
       
       setIsScanning(true);
       try {
-        // Get recent blocks and search for transactions
+        console.log('Fetching transactions for log:', walletAddress);
         const currentBlock = await megaethAPI.getBlockNumber();
         const recentTxs: Transaction[] = [];
         
-        // Check last 10 blocks for transactions involving this wallet
-        for (let i = 0; i < 10; i++) {
+        // Check only last 5 blocks to reduce API calls
+        for (let i = 0; i < 5; i++) {
           const blockNum = currentBlock - i;
+          
           try {
+            // Add delay between block fetches to avoid rate limiting
+            if (i > 0) await delay(800);
+            
             const block = await megaethAPI.getBlock(blockNum);
             
-            if (block && block.transactions) {
-              for (const txHash of block.transactions) {
+            if (block && block.transactions && Array.isArray(block.transactions)) {
+              // Limit to first 3 transactions per block to reduce API load
+              const txHashes = block.transactions.slice(0, 3);
+              
+              for (let j = 0; j < txHashes.length; j++) {
+                const txHash = txHashes[j];
+                
                 try {
+                  // Add delay between transaction fetches
+                  if (j > 0) await delay(400);
+                  
                   const tx = await megaethAPI.getTransactionByHash(txHash);
-                  const receipt = await megaethAPI.getTransactionReceipt(txHash);
                   
                   if (tx && (tx.from?.toLowerCase() === walletAddress.toLowerCase() || 
                            tx.to?.toLowerCase() === walletAddress.toLowerCase())) {
+                    
+                    // Try to get receipt with error handling
+                    let gasUsed = 21000; // Default gas
+                    let status: 'success' | 'failed' = 'success';
+                    
+                    try {
+                      await delay(200);
+                      const receipt = await megaethAPI.getTransactionReceipt(txHash);
+                      if (receipt) {
+                        gasUsed = parseInt(receipt.gasUsed, 16);
+                        status = receipt.status === '0x1' ? 'success' : 'failed';
+                      }
+                    } catch (receiptError) {
+                      console.log(`Could not fetch receipt for ${txHash}, using defaults`);
+                    }
                     
                     const transaction: Transaction = {
                       hash: tx.hash,
                       from: tx.from || '',
                       to: tx.to || '',
                       value: megaethAPI.weiToEther(tx.value || '0x0').toFixed(3),
-                      gasUsed: receipt ? parseInt(receipt.gasUsed, 16) : 21000,
+                      gasUsed,
                       timestamp: parseInt(block.timestamp, 16) * 1000,
                       type: tx.from?.toLowerCase() === walletAddress.toLowerCase() ? 'out' : 'in',
-                      status: receipt && receipt.status === '0x1' ? 'success' : 'failed'
+                      status
                     };
                     
                     recentTxs.push(transaction);
                   }
                 } catch (error) {
-                  console.log(`Error fetching transaction ${txHash}:`, error);
+                  console.log(`Skipping transaction ${txHash} due to error`);
                 }
               }
             }
           } catch (error) {
-            console.log(`Error fetching block ${blockNum}:`, error);
+            console.log(`Skipping block ${blockNum} due to error`);
           }
         }
         
+        console.log('Found transactions for log:', recentTxs.length);
         setTransactions(recentTxs.sort((a, b) => b.timestamp - a.timestamp));
       } catch (error) {
         console.error('Error fetching transactions:', error);
@@ -81,10 +111,10 @@ export const TransactionLog = ({ walletAddress }: TransactionLogProps) => {
 
     fetchTransactions();
     
-    // Poll for new transactions every 5 seconds
-    const interval = setInterval(fetchTransactions, 5000);
+    // Reduce polling frequency to every 20 seconds
+    const interval = setInterval(fetchTransactions, 20000);
     return () => clearInterval(interval);
-  }, [walletAddress]);
+  }, [walletAddress, isScanning]);
 
   const formatTime = (timestamp: number) => {
     const diff = Date.now() - timestamp;
@@ -108,7 +138,7 @@ export const TransactionLog = ({ walletAddress }: TransactionLogProps) => {
           ) : (
             <>
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-green-400 font-mono text-sm">REAL-TIME FEED</span>
+              <span className="text-green-400 font-mono text-sm">SCAN COMPLETE</span>
             </>
           )}
         </div>
@@ -121,7 +151,8 @@ export const TransactionLog = ({ walletAddress }: TransactionLogProps) => {
       <div className="space-y-2 max-h-80 overflow-y-auto">
         {transactions.length === 0 && !isScanning ? (
           <div className="text-center text-gray-400 py-8">
-            <p>No recent transactions found for this wallet</p>
+            <p>No transactions found for this wallet</p>
+            <p className="text-xs mt-1">This wallet may not have recent activity</p>
           </div>
         ) : (
           transactions.map((tx, index) => (
