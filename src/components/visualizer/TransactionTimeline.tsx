@@ -16,45 +16,27 @@ interface TransactionTimelineProps {
   walletAddress: string;
 }
 
-// Rate limiting utility
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const TransactionTimeline = ({ walletAddress }: TransactionTimelineProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeNode, setActiveNode] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {
-      if (!walletAddress || isLoading) return;
+      if (!walletAddress) return;
       
-      setIsLoading(true);
       try {
-        console.log('Fetching transactions for timeline:', walletAddress);
         const currentBlock = await megaethAPI.getBlockNumber();
         const recentTxs: Transaction[] = [];
         
-        // Check only last 3 blocks to reduce API calls
-        for (let i = 0; i < 3; i++) {
+        // Check last 5 blocks for transactions
+        for (let i = 0; i < 5; i++) {
           const blockNum = currentBlock - i;
-          
           try {
-            // Add delay between API calls to avoid rate limiting
-            if (i > 0) await delay(500);
-            
             const block = await megaethAPI.getBlock(blockNum);
             
-            if (block && block.transactions && Array.isArray(block.transactions)) {
-              // Limit to first 2 transactions per block to reduce API load
-              const txHashes = block.transactions.slice(0, 2);
-              
-              for (let j = 0; j < txHashes.length; j++) {
-                const txHash = txHashes[j];
-                
+            if (block && block.transactions) {
+              for (const txHash of block.transactions.slice(0, 3)) { // Limit to 3 per block
                 try {
-                  // Add delay between transaction fetches
-                  if (j > 0) await delay(300);
-                  
                   const tx = await megaethAPI.getTransactionByHash(txHash);
                   
                   if (tx && (tx.from?.toLowerCase() === walletAddress.toLowerCase() || 
@@ -72,30 +54,27 @@ export const TransactionTimeline = ({ walletAddress }: TransactionTimelineProps)
                     recentTxs.push(transaction);
                   }
                 } catch (error) {
-                  console.log(`Skipping transaction ${txHash} due to error`);
+                  console.log(`Error fetching transaction:`, error);
                 }
               }
             }
           } catch (error) {
-            console.log(`Skipping block ${blockNum} due to error`);
+            console.log(`Error fetching block:`, error);
           }
         }
         
-        console.log('Found transactions for timeline:', recentTxs.length);
         setTransactions(recentTxs.slice(0, 6).sort((a, b) => b.timestamp - a.timestamp));
       } catch (error) {
         console.error('Error fetching recent transactions:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchRecentTransactions();
     
-    // Reduce polling frequency to every 15 seconds to avoid rate limits
-    const interval = setInterval(fetchRecentTransactions, 15000);
+    // Poll for new transactions every 10 seconds
+    const interval = setInterval(fetchRecentTransactions, 10000);
     return () => clearInterval(interval);
-  }, [walletAddress, isLoading]);
+  }, [walletAddress]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -110,15 +89,9 @@ export const TransactionTimeline = ({ walletAddress }: TransactionTimelineProps)
     <div className="relative h-64 overflow-hidden">
       {/* Timeline Container */}
       <div className="flex items-center space-x-4 h-full overflow-x-auto pb-4">
-        {isLoading ? (
-          <div className="text-center text-cyan-400 w-full flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mr-2" />
-            <p>Loading transactions...</p>
-          </div>
-        ) : transactions.length === 0 ? (
+        {transactions.length === 0 ? (
           <div className="text-center text-gray-400 w-full">
             <p>No recent transactions found</p>
-            <p className="text-xs mt-1">Try a different wallet address</p>
           </div>
         ) : (
           transactions.map((tx, index) => (
@@ -128,8 +101,6 @@ export const TransactionTimeline = ({ walletAddress }: TransactionTimelineProps)
                 className={`relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-500 ${getStatusColor(tx.status)} ${
                   activeNode === tx.id ? 'scale-125 shadow-lg shadow-current/50' : ''
                 }`}
-                onMouseEnter={() => setActiveNode(tx.id)}
-                onMouseLeave={() => setActiveNode(null)}
               >
                 <Circle 
                   size={16} 
@@ -165,10 +136,8 @@ export const TransactionTimeline = ({ walletAddress }: TransactionTimelineProps)
 
       {/* Activity Indicator */}
       <div className="absolute top-2 right-2 flex items-center space-x-2 text-xs font-mono">
-        <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400' : 'bg-green-400'} animate-pulse`} />
-        <span className={`${isLoading ? 'text-yellow-400' : 'text-green-400'}`}>
-          {isLoading ? 'SCANNING' : 'LIVE FEED'}
-        </span>
+        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+        <span className="text-green-400">LIVE FEED</span>
       </div>
     </div>
   );
