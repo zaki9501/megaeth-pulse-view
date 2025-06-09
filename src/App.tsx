@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import Portfolio from "./pages/Portfolio";
 import ContractTools from "./pages/ContractTools";
 import Visualizer from "./pages/Visualizer";
+import AddressDetails from "./pages/AddressDetails";
+import TransactionDetails from "./pages/TransactionDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/contract-tools" element={<ContractTools />} />
           <Route path="/visualizer" element={<Visualizer />} />
+          <Route path="/address/:address" element={<AddressDetails />} />
+          <Route path="/transaction/:hash" element={<TransactionDetails />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
