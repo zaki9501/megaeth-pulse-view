@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { ChainOpsOverview } from "@/components/dashboard/ChainOpsOverview";
@@ -13,6 +13,21 @@ import { DeveloperTools } from "@/components/dashboard/DeveloperTools";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("chain-ops");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarCollapsed(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -46,11 +61,11 @@ const Index = () => {
       
       <div
         className={`transition-all duration-300 ${
-          sidebarCollapsed ? "ml-16" : "ml-64"
+          isMobile ? "ml-0" : sidebarCollapsed ? "ml-16" : "ml-64"
         }`}
       >
         <Header />
-        <main className="p-6">
+        <main className="p-3 sm:p-6">
           {renderContent()}
         </main>
       </div>

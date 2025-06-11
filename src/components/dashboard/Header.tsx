@@ -46,7 +46,7 @@ export const Header = () => {
 
   return (
     <header className="bg-gray-800 border-b border-gray-700 p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
           <h2 className="text-lg font-semibold">MegaETH Analytics</h2>
           <div className="flex items-center space-x-2">
@@ -55,12 +55,12 @@ export const Header = () => {
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
             <Input 
               placeholder="Search addresses, transactions..." 
-              className="pl-10 bg-gray-700 border-gray-600 text-white w-80"
+              className="pl-10 bg-gray-700 border-gray-600 text-white w-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -73,13 +73,15 @@ export const Header = () => {
             )}
           </div>
           
-          <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-2">
-            <Link size={16} className="text-blue-400" />
-            <span className="text-sm">Mainnet</span>
-          </div>
-          
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-sm font-semibold">M</span>
+          <div className="flex items-center justify-between sm:justify-start space-x-4">
+            <div className="flex items-center space-x-2 bg-gray-700 rounded-lg px-3 py-2">
+              <Link size={16} className="text-blue-400" />
+              <span className="text-sm">Mainnet</span>
+            </div>
+            
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-sm font-semibold">M</span>
+            </div>
           </div>
         </div>
       </div>
