@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, Clock, TrendingUp, Activity, Database, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
 import { MetricCard } from "./MetricCard";
@@ -89,8 +90,8 @@ export const ChainOpsOverview = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading MegaETH data...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-4"></div>
+            <p className="text-green-400/70">Loading MegaETH data...</p>
           </div>
         </div>
       </div>
@@ -100,7 +101,9 @@ export const ChainOpsOverview = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Chain Operations</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent">
+          Chain Operations
+        </h1>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full animate-pulse ${error ? 'bg-red-400' : 'bg-green-400'}`}></div>
@@ -110,7 +113,7 @@ export const ChainOpsOverview = () => {
           </div>
           <button 
             onClick={refetch}
-            className="px-3 py-1 bg-gray-700 rounded text-sm hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 glass-morphism cyber-border text-green-300 rounded-lg hover:bg-green-500/20 hover:text-green-100 transition-all duration-300 neon-glow"
           >
             Refresh
           </button>
@@ -118,12 +121,12 @@ export const ChainOpsOverview = () => {
       </div>
 
       {error && (
-        <Card className="bg-red-900/20 border-red-800">
+        <Card className="glass-morphism border-red-500/50 bg-red-900/20 neon-glow">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <AlertCircle className="text-red-400" size={20} />
               <span className="text-red-400">MegaETH RPC Issue: {error}</span>
-              <span className="text-gray-400 text-sm ml-2">(Some features may use mock data)</span>
+              <span className="text-green-400/70 text-sm ml-2">(Some features may use mock data)</span>
             </div>
           </CardContent>
         </Card>
@@ -137,9 +140,9 @@ export const ChainOpsOverview = () => {
       </div>
 
       {/* System Status */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="glass-morphism cyber-border neon-glow">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 text-green-100">
             <CheckCircle className="text-green-400" size={20} />
             <span>System Status</span>
           </CardTitle>
@@ -155,18 +158,18 @@ export const ChainOpsOverview = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="glass-morphism cyber-border neon-glow">
           <CardHeader>
-            <CardTitle>Transactions Per Block</CardTitle>
+            <CardTitle className="text-green-100">Transactions Per Block</CardTitle>
           </CardHeader>
           <CardContent>
             <LiveChart type="tps" data={recentBlocks} />
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="glass-morphism cyber-border neon-glow">
           <CardHeader>
-            <CardTitle>Gas Usage</CardTitle>
+            <CardTitle className="text-green-100">Gas Usage</CardTitle>
           </CardHeader>
           <CardContent>
             <LiveChart type="gas" data={recentBlocks} />
@@ -175,67 +178,67 @@ export const ChainOpsOverview = () => {
       </div>
 
       {/* Network Info */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="glass-morphism cyber-border neon-glow">
         <CardHeader>
-          <CardTitle>Network Information</CardTitle>
+          <CardTitle className="text-green-100">Network Information</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-400">Network Name</p>
-              <p className="font-semibold">MEGA Testnet</p>
+              <p className="text-sm text-green-400/70">Network Name</p>
+              <p className="font-semibold text-green-100">MEGA Testnet</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400">Chain ID</p>
-              <p className="font-semibold">6342</p>
+              <p className="text-sm text-green-400/70">Chain ID</p>
+              <p className="font-semibold text-green-100">6342</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400">RPC Endpoint</p>
-              <p className="font-mono text-sm text-blue-400">carrot.megaeth.com/rpc</p>
+              <p className="text-sm text-green-400/70">RPC Endpoint</p>
+              <p className="font-mono text-sm text-emerald-400 hover:text-emerald-300 transition-colors">carrot.megaeth.com/rpc</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400">Last Updated</p>
-              <p className="font-semibold">{chainMetrics.lastUpdated.toLocaleTimeString()}</p>
+              <p className="text-sm text-green-400/70">Last Updated</p>
+              <p className="font-semibold text-green-100">{chainMetrics.lastUpdated.toLocaleTimeString()}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Recent Transactions */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="glass-morphism cyber-border neon-glow">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-green-100">
             <span>Recent Transactions</span>
-            <span className="text-sm text-gray-400">Click on a transaction to view details</span>
+            <span className="text-sm text-green-400/70">Click on a transaction to view details</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-80 overflow-y-auto">
             {recentBlocks.slice(-10).reverse().map((block, blockIndex) => (
               <div key={block.number} className="space-y-2">
-                <div className="text-sm text-gray-400 font-semibold">Block #{block.number}</div>
+                <div className="text-sm text-green-400/70 font-semibold">Block #{block.number}</div>
                 {block.transactions.slice(0, 3).map((txHash, txIndex) => (
                   <div 
                     key={txHash} 
-                    className="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-colors group"
+                    className="flex items-center justify-between p-3 glass-morphism cyber-border rounded-lg hover:bg-green-500/10 cursor-pointer transition-all duration-300 group neon-glow hover:border-green-400/50"
                     onClick={() => handleTransactionClick(txHash)}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="font-mono text-sm text-blue-400 group-hover:text-blue-300">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="font-mono text-sm text-emerald-400 group-hover:text-emerald-300 transition-colors">
                         {txHash.slice(0, 10)}...{txHash.slice(-8)}
                       </span>
-                      <ExternalLink className="text-gray-400 group-hover:text-gray-300" size={14} />
+                      <ExternalLink className="text-green-400/70 group-hover:text-green-300 transition-colors" size={14} />
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-green-400/70">
                         {new Date(block.timestamp * 1000).toLocaleTimeString()}
                       </div>
                     </div>
                   </div>
                 ))}
                 {block.transactions.length > 3 && (
-                  <div className="text-center text-sm text-gray-400 py-2">
+                  <div className="text-center text-sm text-green-400/70 py-2">
                     +{block.transactions.length - 3} more transactions
                   </div>
                 )}
