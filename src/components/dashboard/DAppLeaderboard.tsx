@@ -91,12 +91,14 @@ export const DAppLeaderboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Leaderboard</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent">
+          Leaderboard
+        </h1>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-400">Data range</span>
+          <span className="text-sm text-green-400/70">Data range</span>
           <div className="flex space-x-1">
             {timeRanges.map(range => (
-              <Button key={range} variant="outline" size="sm" className="bg-gray-700 border-gray-600">
+              <Button key={range} variant="outline" size="sm" className="glass-morphism cyber-border text-green-300 hover:bg-green-500/20 hover:text-green-200 transition-all duration-300">
                 {range}
               </Button>
             ))}
@@ -111,7 +113,10 @@ export const DAppLeaderboard = () => {
             key={category} 
             variant={category === "All" ? "default" : "outline"}
             size="sm"
-            className={category === "All" ? "bg-blue-600" : "bg-gray-700 border-gray-600"}
+            className={category === "All" ? 
+              "bg-gradient-to-r from-green-500 to-emerald-500 text-black hover:from-green-400 hover:to-emerald-400 neon-glow" : 
+              "glass-morphism cyber-border text-green-300 hover:bg-green-500/20 hover:text-green-200 transition-all duration-300"
+            }
           >
             {category}
           </Button>
@@ -119,11 +124,11 @@ export const DAppLeaderboard = () => {
       </div>
 
       {/* Leaderboard Table */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="glass-morphism cyber-border neon-glow">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-green-100">
             <span>Top dApps</span>
-            <div className="flex space-x-4 text-sm text-gray-400">
+            <div className="flex space-x-4 text-sm text-green-400/70">
               <span>Gas Use (24h)</span>
               <span>Unique Users</span>
               <span>Volume</span>
@@ -133,33 +138,33 @@ export const DAppLeaderboard = () => {
         <CardContent>
           <div className="space-y-1">
             {dapps.map((dapp, index) => (
-              <div key={index} className="flex items-center justify-between p-4 hover:bg-gray-700 rounded-lg transition-colors group">
+              <div key={index} className="flex items-center justify-between p-4 hover:bg-green-500/10 rounded-lg transition-all duration-300 group cyber-border hover:border-green-400/50">
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-400 text-sm w-6">{dapp.rank}</span>
-                  <div className="w-8 h-8 rounded-lg bg-gray-600 flex items-center justify-center text-sm">
+                  <span className="text-green-400/70 text-sm w-6 font-bold">{dapp.rank}</span>
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center text-sm border border-green-500/30">
                     {dapp.avatar}
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-semibold">{dapp.name}</span>
+                      <span className="font-semibold text-green-100 group-hover:text-white transition-colors">{dapp.name}</span>
                       {dapp.status && <span>{dapp.status}</span>}
                     </div>
-                    <span className="text-sm text-gray-400">{dapp.category}</span>
+                    <span className="text-sm text-green-400/70">{dapp.category}</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center space-x-8">
                   <div className="text-right">
-                    <div className="font-semibold">{dapp.gasUsed}</div>
+                    <div className="font-semibold text-green-200">{dapp.gasUsed}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold">{dapp.uniqueUsers}</div>
+                    <div className="font-semibold text-green-200">{dapp.uniqueUsers}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold">{dapp.volume}</div>
+                    <div className="font-semibold text-green-200">{dapp.volume}</div>
                   </div>
-                  <div className="w-16 h-8 bg-gray-700 rounded flex items-center justify-center">
-                    <div className="w-12 h-2 bg-blue-600 rounded"></div>
+                  <div className="w-16 h-8 bg-black/30 rounded flex items-center justify-center border border-green-500/30">
+                    <div className="w-12 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded neon-glow"></div>
                   </div>
                 </div>
               </div>

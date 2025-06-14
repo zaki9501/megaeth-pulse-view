@@ -41,14 +41,14 @@ export const StatusIndicator = ({ label, status, value }: StatusIndicatorProps) 
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+    <div className="flex items-center justify-between p-4 glass-morphism cyber-border rounded-lg hover:bg-black/40 transition-all duration-300 neon-glow">
       <div>
-        <p className="text-sm text-gray-400">{label}</p>
-        <p className="font-semibold">{value}</p>
+        <p className="text-sm text-green-400/70">{label}</p>
+        <p className="font-semibold text-green-100">{value}</p>
       </div>
       <div className="flex items-center space-x-2">
         <div className={cn("w-2 h-2 rounded-full", getStatusColor(status), status === "syncing" && "animate-pulse")}></div>
-        <span className="text-sm">{getStatusText(status)}</span>
+        <span className="text-sm text-green-300">{getStatusText(status)}</span>
       </div>
     </div>
   );
