@@ -35,7 +35,9 @@ const Portfolio = () => {
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Portfolio Explorer</h1>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent">
+                Portfolio Explorer
+              </h1>
             </div>
 
             {/* Wallet Search */}
@@ -45,23 +47,23 @@ const Portfolio = () => {
             />
 
             {/* Tab Navigation */}
-            <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg w-fit">
+            <div className="flex space-x-1 glass-morphism cyber-border p-1 rounded-lg w-fit neon-glow">
               <button
                 onClick={() => setActiveTab("portfolio")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                   activeTab === "portfolio"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                    ? "bg-green-600 text-white neon-glow"
+                    : "text-green-400/70 hover:text-green-300 hover:bg-green-500/20"
                 }`}
               >
                 Portfolio
               </button>
               <button
                 onClick={() => setActiveTab("transactions")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                   activeTab === "transactions"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                    ? "bg-green-600 text-white neon-glow"
+                    : "text-green-400/70 hover:text-green-300 hover:bg-green-500/20"
                 }`}
               >
                 Transaction History

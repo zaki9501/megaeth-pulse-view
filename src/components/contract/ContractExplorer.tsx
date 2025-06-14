@@ -60,14 +60,14 @@ export const ContractExplorer = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Smart Contract Explorer</h1>
+        <h1 className="text-2xl font-bold text-green-100">Smart Contract Explorer</h1>
       </div>
 
       {/* Contract Search */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="glass-morphism cyber-border neon-glow">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Search className="mr-2 text-blue-400" size={20} />
+          <CardTitle className="flex items-center text-green-100">
+            <Search className="mr-2 text-green-400" size={20} />
             Contract Analysis
           </CardTitle>
         </CardHeader>
@@ -78,12 +78,12 @@ export const ContractExplorer = () => {
               placeholder="Enter contract address (0x...)"
               value={contractAddress}
               onChange={(e) => setContractAddress(e.target.value)}
-              className="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+              className="flex-1 px-4 py-3 glass-morphism cyber-border rounded-lg text-green-100 placeholder-green-400/50 focus:outline-none focus:border-green-400/50 focus:neon-glow transition-all duration-300"
             />
             <button
               onClick={analyzeContract}
               disabled={isLoading}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-all duration-300 neon-glow hover:shadow-lg hover:shadow-green-500/30"
             >
               {isLoading ? 'Analyzing...' : 'Analyze'}
             </button>
@@ -92,7 +92,7 @@ export const ContractExplorer = () => {
       </Card>
 
       {error && (
-        <Card className="bg-red-900/20 border-red-800">
+        <Card className="glass-morphism border-red-500/50 bg-red-900/20 neon-glow">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2 text-red-400">
               <AlertCircle size={20} />
@@ -105,9 +105,9 @@ export const ContractExplorer = () => {
       {contractData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Contract Information */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="glass-morphism cyber-border neon-glow">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-green-100">
                 <FileText className="mr-2 text-green-400" size={20} />
                 Contract Information
               </CardTitle>
@@ -115,14 +115,14 @@ export const ContractExplorer = () => {
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Address</label>
-                  <div className="font-mono text-blue-400 break-all bg-gray-700 p-2 rounded">
+                  <label className="text-sm text-green-400/70 block mb-1">Address</label>
+                  <div className="font-mono text-emerald-400 break-all glass-morphism p-2 rounded cyber-border">
                     {contractData.address}
                   </div>
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Type</label>
+                  <label className="text-sm text-green-400/70 block mb-1">Type</label>
                   <div className={`flex items-center space-x-2 ${contractData.isContract ? 'text-green-400' : 'text-yellow-400'}`}>
                     <Code size={16} />
                     <span>{contractData.isContract ? 'Smart Contract' : 'Externally Owned Account (EOA)'}</span>
@@ -131,8 +131,8 @@ export const ContractExplorer = () => {
 
                 {contractData.isContract && (
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Code Size</label>
-                    <div className="text-white">
+                    <label className="text-sm text-green-400/70 block mb-1">Code Size</label>
+                    <div className="text-green-100">
                       {contractData.codeSize.toLocaleString()} bytes
                     </div>
                   </div>
@@ -143,9 +143,9 @@ export const ContractExplorer = () => {
 
           {/* Storage Reader */}
           {contractData.isContract && (
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="glass-morphism cyber-border neon-glow">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-green-100">
                   <Database className="mr-2 text-purple-400" size={20} />
                   Storage Reader
                 </CardTitle>
@@ -157,11 +157,11 @@ export const ContractExplorer = () => {
                     placeholder="Storage slot (0, 1, 2...)"
                     value={storageSlot}
                     onChange={(e) => setStorageSlot(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
+                    className="flex-1 px-3 py-2 glass-morphism cyber-border rounded text-green-100 placeholder-green-400/50 focus:outline-none focus:border-green-400/50"
                   />
                   <button
                     onClick={readStorage}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-all duration-300 neon-glow hover:shadow-lg hover:shadow-purple-500/30"
                   >
                     Read
                   </button>
@@ -169,11 +169,11 @@ export const ContractExplorer = () => {
                 
                 {storageValue && (
                   <div>
-                    <label className="text-sm text-gray-400 block mb-1">Value at slot {storageSlot}</label>
-                    <div className="font-mono text-green-400 bg-gray-700 p-2 rounded break-all">
+                    <label className="text-sm text-green-400/70 block mb-1">Value at slot {storageSlot}</label>
+                    <div className="font-mono text-green-400 glass-morphism p-2 rounded break-all cyber-border">
                       {storageValue}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-green-500/70 mt-1">
                       Decimal: {parseInt(storageValue, 16)}
                     </div>
                   </div>
@@ -186,15 +186,15 @@ export const ContractExplorer = () => {
 
       {/* Bytecode Viewer */}
       {contractData?.isContract && (
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="glass-morphism cyber-border neon-glow">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-green-100">
               <Code className="mr-2 text-orange-400" size={20} />
               Contract Bytecode
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-black rounded-lg p-4 max-h-80 overflow-y-auto">
+            <div className="bg-black/50 rounded-lg p-4 max-h-80 overflow-y-auto cyber-border">
               <pre className="font-mono text-sm text-green-400 break-all whitespace-pre-wrap">
                 {contractData.bytecode}
               </pre>
