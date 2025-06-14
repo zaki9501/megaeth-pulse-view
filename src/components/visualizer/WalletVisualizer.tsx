@@ -107,7 +107,7 @@ export const WalletVisualizer = () => {
                 MegaETH Explorer
               </h1>
               <p className="text-base sm:text-lg text-gray-400 flex items-center space-x-2">
-                <Eye size={16} className="sm:size-18" />
+                <Eye size={16} />
                 <span>Advanced Blockchain Intelligence Platform</span>
               </p>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2">
@@ -116,7 +116,7 @@ export const WalletVisualizer = () => {
                   Network Online
                 </Badge>
                 <Badge variant="outline" className="border-blue-500 text-blue-400 text-xs sm:text-sm">
-                  <Cpu size={12} className="sm:size-14 mr-1" />
+                  <Cpu size={14} className="mr-1" />
                   Real-time Analysis
                 </Badge>
               </div>
@@ -130,7 +130,7 @@ export const WalletVisualizer = () => {
               size="sm"
               className="h-8 sm:h-10 px-2 sm:px-4 flex-1 lg:flex-none text-xs sm:text-sm"
             >
-              <Layers size={14} className="sm:size-16 mr-1 sm:mr-2" />
+              <Layers size={14} className="mr-1 sm:mr-2" />
               Simple
             </Button>
             <Button
@@ -139,7 +139,7 @@ export const WalletVisualizer = () => {
               size="sm"
               className="h-8 sm:h-10 px-2 sm:px-4 flex-1 lg:flex-none text-xs sm:text-sm"
             >
-              <Shield size={14} className="sm:size-16 mr-1 sm:mr-2" />
+              <Shield size={14} className="mr-1 sm:mr-2" />
               Detailed
             </Button>
           </div>
@@ -149,7 +149,7 @@ export const WalletVisualizer = () => {
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="pb-3 sm:pb-4">
             <CardTitle className="text-lg sm:text-xl text-white flex items-center space-x-2">
-              <Search size={18} className="sm:size-20" />
+              <Search size={20} />
               <span>Blockchain Address Analyzer</span>
             </CardTitle>
             <p className="text-gray-400 text-sm">
@@ -160,7 +160,7 @@ export const WalletVisualizer = () => {
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 items-stretch sm:items-end">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} className="sm:size-20" />
+                  <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                   <Input
                     placeholder="0x742d35Cc6634C0532925a3b8D85B62B1fBaDbD61 or vitalik.eth"
                     value={walletAddress}
@@ -188,7 +188,7 @@ export const WalletVisualizer = () => {
                   </div>
                 ) : (
                   <>
-                    <Zap size={16} className="sm:size-18 mr-1 sm:mr-2" />
+                    <Zap size={16} className="mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Analyze Address</span>
                     <span className="sm:hidden">Analyze</span>
                   </>
@@ -229,7 +229,7 @@ export const WalletVisualizer = () => {
                 <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="pb-3 sm:pb-4">
                     <CardTitle className="text-white flex items-center space-x-2 text-base sm:text-lg">
-                      <Activity size={18} className="sm:size-20" />
+                      <Activity size={20} />
                       <span>Transaction Activity</span>
                       <Badge variant="outline" className="border-green-500 text-green-400 ml-auto text-xs">
                         Live
@@ -244,7 +244,7 @@ export const WalletVisualizer = () => {
                 <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="pb-3 sm:pb-4">
                     <CardTitle className="text-white flex items-center space-x-2 text-base sm:text-lg">
-                      <Zap size={18} className="sm:size-20" />
+                      <Zap size={20} />
                       <span>Gas Usage Analysis</span>
                       <Badge variant="outline" className="border-orange-500 text-orange-400 ml-auto text-xs">
                         Thermal
@@ -261,7 +261,7 @@ export const WalletVisualizer = () => {
               <Card className="bg-gray-800 border-gray-700">
                 <CardHeader className="pb-3 sm:pb-4">
                   <CardTitle className="text-white flex items-center space-x-2 text-base sm:text-lg">
-                    <Globe size={18} className="sm:size-20" />
+                    <Globe size={20} />
                     <span>Network Connections</span>
                     <Badge variant="outline" className="border-blue-500 text-blue-400 ml-auto text-xs">
                       Mapping
@@ -277,7 +277,7 @@ export const WalletVisualizer = () => {
               <Card className="bg-gray-800 border-gray-700">
                 <CardHeader className="pb-3 sm:pb-4">
                   <CardTitle className="text-white flex items-center space-x-2 text-base sm:text-lg">
-                    <Activity size={18} className="sm:size-20" />
+                    <Activity size={20} />
                     <span>Recent Transactions</span>
                     <Badge variant="outline" className="border-purple-500 text-purple-400 ml-auto text-xs">
                       Detailed
@@ -363,21 +363,21 @@ export const WalletVisualizer = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
                 <div className="text-center">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-600 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <Eye size={20} className="sm:size-24 text-white" />
+                    <Eye size={24} className="text-white" />
                   </div>
                   <h4 className="font-semibold text-white mb-1 sm:mb-2 text-sm sm:text-base">Real-time Data</h4>
                   <p className="text-xs sm:text-sm text-gray-400">Live blockchain information</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <Activity size={20} className="sm:size-24 text-white" />
+                    <Activity size={24} className="text-white" />
                   </div>
                   <h4 className="font-semibold text-white mb-1 sm:mb-2 text-sm sm:text-base">Complete History</h4>
                   <p className="text-xs sm:text-sm text-gray-400">Full transaction timeline</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <Shield size={20} className="sm:size-24 text-white" />
+                    <Shield size={24} className="text-white" />
                   </div>
                   <h4 className="font-semibold text-white mb-1 sm:mb-2 text-sm sm:text-base">Smart Analysis</h4>
                   <p className="text-xs sm:text-sm text-gray-400">Advanced pattern recognition</p>
