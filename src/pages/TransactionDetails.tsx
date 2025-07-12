@@ -89,40 +89,40 @@ const TransactionDetails = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'success':
-        return <CheckCircle className="text-green-400" size={20} />;
+        return <CheckCircle className="text-green-400/80" size={20} />;
       case 'failed':
-        return <XCircle className="text-red-400" size={20} />;
+        return <XCircle className="text-red-400/80" size={20} />;
       case 'pending':
-        return <Loader className="text-yellow-400 animate-spin" size={20} />;
+        return <Loader className="text-yellow-400/80 animate-spin" size={20} />;
       default:
-        return <Clock className="text-gray-400" size={20} />;
+        return <Clock className="text-muted-foreground" size={20} />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
-        return 'border-green-500 text-green-400';
+        return 'border-green-500/50 text-green-400/80 bg-green-500/5';
       case 'failed':
-        return 'border-red-500 text-red-400';
+        return 'border-red-500/50 text-red-400/80 bg-red-500/5';
       case 'pending':
-        return 'border-yellow-500 text-yellow-400';
+        return 'border-yellow-500/50 text-yellow-400/80 bg-yellow-500/5';
       default:
-        return 'border-gray-500 text-gray-400';
+        return 'border-border text-muted-foreground';
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
         <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
           <Header />
           <main className="p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-400">Loading transaction details...</p>
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading transaction details...</p>
               </div>
             </div>
           </main>
@@ -133,12 +133,12 @@ const TransactionDetails = () => {
 
   if (error || !txData) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
         <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
           <Header />
           <main className="p-6">
-            <div className="text-center text-red-400">
+            <div className="text-center text-red-400/80">
               <h2 className="text-xl font-bold mb-2">Error</h2>
               <p>{error || 'Transaction not found'}</p>
             </div>
@@ -149,7 +149,7 @@ const TransactionDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
         <Header />
@@ -157,8 +157,8 @@ const TransactionDetails = () => {
           {/* Transaction Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">Transaction Details</h1>
-              <p className="text-gray-400 font-mono text-sm break-all">{txData.hash}</p>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Transaction Details</h1>
+              <p className="text-muted-foreground font-mono text-sm break-all">{txData.hash}</p>
             </div>
             <Badge variant="outline" className={getStatusColor(txData.status)}>
               {getStatusIcon(txData.status)}
@@ -168,67 +168,67 @@ const TransactionDetails = () => {
 
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-green-400 flex items-center text-sm">
+                <CardTitle className="text-primary flex items-center text-sm">
                   <ArrowRight className="w-4 h-4 mr-1" />
                   Value
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-bold text-white">
+                <div className="text-xl font-bold text-foreground">
                   {parseFloat(txData.value).toFixed(6)} ETH
                 </div>
-                <div className="text-gray-400 text-xs">
+                <div className="text-muted-foreground text-xs">
                   ≈ ${(parseFloat(txData.value) * 3200).toFixed(2)} USD
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-orange-400 flex items-center text-sm">
+                <CardTitle className="text-orange-400/80 flex items-center text-sm">
                   <Zap className="w-4 h-4 mr-1" />
                   Gas Used
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-bold text-white">
+                <div className="text-xl font-bold text-foreground">
                   {parseInt(txData.gasUsed, 16).toLocaleString()}
                 </div>
-                <div className="text-gray-400 text-xs">
+                <div className="text-muted-foreground text-xs">
                   of {parseInt(txData.gasLimit, 16).toLocaleString()} limit
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-blue-400 flex items-center text-sm">
+                <CardTitle className="text-blue-400/80 flex items-center text-sm">
                   <Hash className="w-4 h-4 mr-1" />
                   Block
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-bold text-white">
+                <div className="text-xl font-bold text-foreground">
                   {txData.blockNumber === 'pending' ? 'Pending' : parseInt(txData.blockNumber, 16).toLocaleString()}
                 </div>
-                <div className="text-gray-400 text-xs">Block number</div>
+                <div className="text-muted-foreground text-xs">Block number</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-purple-400 flex items-center text-sm">
+                <CardTitle className="text-purple-400/80 flex items-center text-sm">
                   <Clock className="w-4 h-4 mr-1" />
                   Time
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm font-bold text-white">
+                <div className="text-sm font-bold text-foreground">
                   {new Date(txData.timestamp).toLocaleTimeString()}
                 </div>
-                <div className="text-gray-400 text-xs">
+                <div className="text-muted-foreground text-xs">
                   {new Date(txData.timestamp).toLocaleDateString()}
                 </div>
               </CardContent>
@@ -236,21 +236,21 @@ const TransactionDetails = () => {
           </div>
 
           {/* Transaction Details */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">Transaction Information</CardTitle>
+              <CardTitle className="text-foreground">Transaction Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">From</label>
-                  <div className="font-mono text-sm text-blue-400 break-all bg-gray-700 p-3 rounded">
+                  <label className="text-sm text-muted-foreground block mb-1">From</label>
+                  <div className="font-mono text-sm text-primary break-all bg-muted p-3 rounded">
                     {txData.from}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">To</label>
-                  <div className="font-mono text-sm text-blue-400 break-all bg-gray-700 p-3 rounded">
+                  <label className="text-sm text-muted-foreground block mb-1">To</label>
+                  <div className="font-mono text-sm text-primary break-all bg-muted p-3 rounded">
                     {txData.to || 'Contract Creation'}
                   </div>
                 </div>
@@ -258,20 +258,20 @@ const TransactionDetails = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Gas Price</label>
-                  <div className="font-mono text-sm text-white bg-gray-700 p-3 rounded">
+                  <label className="text-sm text-muted-foreground block mb-1">Gas Price</label>
+                  <div className="font-mono text-sm text-foreground bg-muted p-3 rounded">
                     {megaethAPI.weiToGwei(txData.gasPrice).toFixed(2)} Gwei
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Nonce</label>
-                  <div className="font-mono text-sm text-white bg-gray-700 p-3 rounded">
+                  <label className="text-sm text-muted-foreground block mb-1">Nonce</label>
+                  <div className="font-mono text-sm text-foreground bg-muted p-3 rounded">
                     {parseInt(txData.nonce, 16)}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Position in Block</label>
-                  <div className="font-mono text-sm text-white bg-gray-700 p-3 rounded">
+                  <label className="text-sm text-muted-foreground block mb-1">Position in Block</label>
+                  <div className="font-mono text-sm text-foreground bg-muted p-3 rounded">
                     {parseInt(txData.transactionIndex, 16)}
                   </div>
                 </div>
@@ -279,8 +279,8 @@ const TransactionDetails = () => {
 
               {txData.data && txData.data !== '0x' && (
                 <div>
-                  <label className="text-sm text-gray-400 block mb-1">Input Data</label>
-                  <div className="font-mono text-xs text-gray-300 bg-gray-900 p-4 rounded max-h-32 overflow-y-auto break-all">
+                  <label className="text-sm text-muted-foreground block mb-1">Input Data</label>
+                  <div className="font-mono text-xs text-muted-foreground bg-secondary p-4 rounded max-h-32 overflow-y-auto break-all">
                     {txData.data}
                   </div>
                 </div>
