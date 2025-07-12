@@ -125,15 +125,15 @@ export default {
 						transform: 'translateY(0px)'
 					},
 					'50%': {
-						transform: 'translateY(-10px)'
+						transform: 'translateY(-6px)'
 					}
 				},
 				'glow': {
 					'0%, 100%': {
-						boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+						boxShadow: '0 0 10px rgba(134, 239, 172, 0.1)'
 					},
 					'50%': {
-						boxShadow: '0 0 30px rgba(139, 92, 246, 0.6)'
+						boxShadow: '0 0 15px rgba(134, 239, 172, 0.2)'
 					}
 				}
 			},
@@ -143,8 +143,8 @@ export default {
 				'fade-in': 'fade-in 0.5s ease-in-out',
 				'scale-in': 'scale-in 0.3s ease-out',
 				'slide-up': 'slide-up 0.4s ease-out',
-				'float': 'float 3s ease-in-out infinite',
-				'glow': 'glow 2s ease-in-out infinite'
+				'float': 'float 4s ease-in-out infinite',
+				'glow': 'glow 3s ease-in-out infinite'
 			}
 		}
 	},
