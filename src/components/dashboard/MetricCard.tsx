@@ -14,22 +14,22 @@ export const MetricCard = ({ title, value, icon: Icon, change }: MetricCardProps
   const isPositive = change.startsWith("+");
   
   return (
-    <Card className="glass-morphism cyber-border hover:bg-green-500/10 transition-all duration-300 group neon-glow hover:scale-105">
+    <Card className="professional-card hover:bg-accent/50 transition-all duration-200 group professional-shadow">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-green-400/70 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-green-100 group-hover:text-white transition-colors">{value}</p>
+            <p className="text-sm text-muted-foreground mb-1">{title}</p>
+            <p className="text-2xl font-semibold text-foreground group-hover:text-primary transition-colors">{value}</p>
             <div className={cn(
-              "flex items-center space-x-1 mt-2 text-sm transition-all duration-300",
-              isPositive ? "text-green-400 group-hover:text-green-300" : "text-red-400 group-hover:text-red-300"
+              "flex items-center space-x-1 mt-2 text-sm transition-all duration-200",
+              isPositive ? "text-primary" : "text-destructive"
             )}>
-              {isPositive ? <TrendingUp size={16} className="group-hover:scale-110 transition-transform duration-300" /> : <TrendingDown size={16} className="group-hover:scale-110 transition-transform duration-300" />}
+              {isPositive ? <TrendingUp size={16} className="group-hover:scale-110 transition-transform duration-200" /> : <TrendingDown size={16} className="group-hover:scale-110 transition-transform duration-200" />}
               <span>{change}</span>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-3 rounded-lg border border-green-500/30 group-hover:scale-110 transition-all duration-300 neon-glow">
-            <Icon className="text-green-400 group-hover:text-green-300 transition-colors" size={24} />
+          <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 group-hover:scale-110 transition-all duration-200">
+            <Icon className="text-primary transition-colors" size={24} />
           </div>
         </div>
       </CardContent>

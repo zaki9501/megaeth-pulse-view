@@ -23,7 +23,7 @@ const Portfolio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex w-full">
+    <div className="min-h-screen bg-background text-foreground flex w-full">
       <Sidebar 
         activeTab="portfolio" 
         setActiveTab={() => {}}
@@ -35,7 +35,7 @@ const Portfolio = () => {
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-semibold text-foreground">
                 Portfolio Explorer
               </h1>
             </div>
@@ -47,23 +47,23 @@ const Portfolio = () => {
             />
 
             {/* Tab Navigation */}
-            <div className="flex space-x-1 glass-morphism cyber-border p-1 rounded-lg w-fit neon-glow">
+            <div className="flex space-x-1 professional-card p-1 rounded-lg w-fit">
               <button
                 onClick={() => setActiveTab("portfolio")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                   activeTab === "portfolio"
-                    ? "bg-green-600 text-white neon-glow"
-                    : "text-green-400/70 hover:text-green-300 hover:bg-green-500/20"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
                 Portfolio
               </button>
               <button
                 onClick={() => setActiveTab("transactions")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                   activeTab === "transactions"
-                    ? "bg-green-600 text-white neon-glow"
-                    : "text-green-400/70 hover:text-green-300 hover:bg-green-500/20"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
                 Transaction History
