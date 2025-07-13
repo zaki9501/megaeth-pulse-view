@@ -2,6 +2,7 @@
 import { BarChart, Activity, Users, Settings, ChevronLeft, ChevronRight, User, Code, Eye, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface SidebarProps {
   activeTab: string;
@@ -13,6 +14,8 @@ interface SidebarProps {
 export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: SidebarProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -25,19 +28,23 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
   }, []);
 
   const menuItems = [
-    { id: "chain-ops", label: "Dashboard", icon: Activity },
-    { id: "leaderboard", label: "Leaderboard", icon: BarChart },
-    { id: "whale-tracker", label: "Wallet Tracker", icon: Users },
-    { id: "portfolio", label: "Portfolio", icon: User },
-    { id: "contract-tools", label: "Contract Tools", icon: Code },
-    { id: "visualizer", label: "Visualizer", icon: Eye },
-    { id: "dev-tools", label: "Dev Tools", icon: Settings },
+    { id: "chain-ops", label: "Dashboard", icon: Activity, route: "/" },
+    { id: "leaderboard", label: "Leaderboard", icon: BarChart, route: "/" },
+    { id: "whale-tracker", label: "Wallet Tracker", icon: Users, route: "/" },
+    { id: "portfolio", label: "Portfolio", icon: User, route: "/portfolio" },
+    { id: "contract-tools", label: "Contract Tools", icon: Code, route: "/contract-tools" },
+    { id: "visualizer", label: "Visualizer", icon: Eye, route: "/visualizer" },
+    { id: "dev-tools", label: "Dev Tools", icon: Settings, route: "/" },
   ];
 
-  const handleTabClick = (tabId: string) => {
+  const handleTabClick = (tabId: string, route: string) => {
     setActiveTab(tabId);
     if (isMobile) {
       setMobileMenuOpen(false);
+    }
+    // Navigate to the appropriate route
+    if (route !== location.pathname) {
+      navigate(route);
     }
   };
 
@@ -87,7 +94,7 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleTabClick(item.id)}
+                  onClick={() => handleTabClick(item.id, item.route)}
                   className={cn(
                     "w-full flex items-center px-4 py-3 mb-2 text-left rounded-lg transition-all duration-200 group",
                     isActive 
@@ -141,7 +148,7 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabClick(item.id, item.route)}
               className={cn(
                 "w-full flex items-center px-4 py-3 mb-2 text-left rounded-lg transition-all duration-200 group",
                 isActive 
