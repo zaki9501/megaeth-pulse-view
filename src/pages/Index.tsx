@@ -1,7 +1,6 @@
 
 import { ChainOpsOverview } from "@/components/dashboard/ChainOpsOverview";
 import { DAppLeaderboard } from "@/components/dashboard/DAppLeaderboard";
-import { WhaleTracker } from "@/components/dashboard/WhaleTracker";
 import { WalletPortfolio } from "@/components/portfolio/WalletPortfolio";
 import { ContractExplorer } from "@/components/contract/ContractExplorer";
 import { WalletVisualizer } from "@/components/visualizer/WalletVisualizer";
@@ -18,8 +17,6 @@ const Index = ({ activeTab }: IndexProps) => {
         return <ChainOpsOverview />;
       case "leaderboard":
         return <DAppLeaderboard />;
-      case "whale-tracker":
-        return <WhaleTracker />;
       case "portfolio":
         return <WalletPortfolio />;
       case "contract-tools":

@@ -30,11 +30,10 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
   const menuItems = [
     { id: "chain-ops", label: "Dashboard", icon: Activity, route: "/" },
     { id: "leaderboard", label: "Leaderboard", icon: BarChart, route: "/" },
-    { id: "whale-tracker", label: "Wallet Tracker", icon: Users, route: "/" },
     { id: "portfolio", label: "Portfolio", icon: User, route: "/portfolio" },
     { id: "contract-tools", label: "Contract Tools", icon: Code, route: "/contract-tools" },
-    { id: "visualizer", label: "Visualizer", icon: Eye, route: "/visualizer" },
-    { id: "dev-tools", label: "Dev Tools", icon: Settings, route: "/" },
+    { id: "visualizer", label: "Visualizer", icon: Eye, route: "/visualizer", disabled: true },
+    { id: "dev-tools", label: "Dev Tools", icon: Settings, route: "/", disabled: true },
   ];
 
   const handleTabClick = (tabId: string, route: string) => {
@@ -91,22 +90,29 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
+              const isDisabled = item.disabled;
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleTabClick(item.id, item.route)}
+                  onClick={() => !isDisabled && handleTabClick(item.id, item.route)}
                   className={cn(
                     "w-full flex items-center px-4 py-3 mb-2 text-left rounded-lg transition-all duration-200 group",
                     isActive 
                       ? "bg-primary text-primary-foreground font-medium professional-shadow" 
-                      : "hover:bg-muted/50 text-foreground"
+                      : isDisabled
+                        ? "text-muted-foreground opacity-60 cursor-not-allowed bg-muted/30"
+                        : "hover:bg-muted/50 text-foreground"
                   )}
                   style={{
                     animationDelay: `${index * 50}ms`
                   }}
+                  disabled={isDisabled}
                 >
                   <Icon size={20} className="mr-3" />
                   <span className="font-medium">{item.label}</span>
+                  {isDisabled && (
+                    <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground border border-border">Coming Soon</span>
+                  )}
                 </button>
               );
             })}
@@ -145,24 +151,31 @@ export const Sidebar = ({ activeTab, setActiveTab, collapsed, setCollapsed }: Si
         {menuItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const isDisabled = item.disabled;
           return (
             <button
               key={item.id}
-              onClick={() => handleTabClick(item.id, item.route)}
+              onClick={() => !isDisabled && handleTabClick(item.id, item.route)}
               className={cn(
                 "w-full flex items-center px-4 py-3 mb-2 text-left rounded-lg transition-all duration-200 group",
                 isActive 
                   ? "bg-primary text-primary-foreground font-medium professional-shadow" 
-                  : "hover:bg-muted/50 text-foreground",
+                  : isDisabled
+                    ? "text-muted-foreground opacity-60 cursor-not-allowed bg-muted/30"
+                    : "hover:bg-muted/50 text-foreground",
                 collapsed && "justify-center px-2"
               )}
               style={{
                 animationDelay: `${index * 30}ms`
               }}
+              disabled={isDisabled}
             >
               <Icon size={20} className={cn(!collapsed && "mr-3")} />
               {!collapsed && (
                 <span className="font-medium animate-fade-in">{item.label}</span>
+              )}
+              {isDisabled && !collapsed && (
+                <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground border border-border">Coming Soon</span>
               )}
             </button>
           );
