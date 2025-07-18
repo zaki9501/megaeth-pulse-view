@@ -27,6 +27,8 @@ interface Transaction {
   isContract: boolean;
 }
 
+const INDEXER_BLOCK_API = "https://jiti.indexing.co/networks/MEGAETH_TESTNET";
+
 export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,81 +46,48 @@ export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) =
 
   const fetchTransactionHistory = async () => {
     if (!walletAddress) return;
-    
     setIsLoading(true);
     setError(null);
-    
     try {
-      console.log('Fetching transaction history for:', walletAddress);
-      
-      // Get the latest block number
       const latestBlock = await megaethAPI.getBlockNumber();
-      console.log('Latest block:', latestBlock);
-      
+      const blockNumbers = Array.from({ length: 100 }, (_, i) => latestBlock - i);
+      const blockPromises = blockNumbers.map(num => fetch(`${INDEXER_BLOCK_API}/${num}`).then(r => r.ok ? r.json() : null).catch(() => null));
+      const blocks = await Promise.all(blockPromises);
       const txHistory: Transaction[] = [];
-      const blocksToCheck = 5; // Check last 5 blocks
-      
-      // Check recent blocks for transactions involving this address
-      for (let i = 0; i < blocksToCheck; i++) {
-        try {
-          const blockNumber = latestBlock - i;
-          const block = await megaethAPI.getBlock(blockNumber);
-          
-          if (block && block.transactions) {
-            // For each transaction hash, get full transaction details
-            for (let j = 0; j < Math.min(block.transactions.length, 3); j++) { // Limit to 3 per block
-              try {
-                const txHash = block.transactions[j];
-                const tx = await megaethAPI.getTransactionByHash(txHash);
-                
-                if (tx && (tx.from?.toLowerCase() === walletAddress.toLowerCase() || 
-                          tx.to?.toLowerCase() === walletAddress.toLowerCase())) {
-                  
-                  const valueEth = tx.value ? megaethAPI.weiToEther(tx.value) : 0;
-                  const gasPrice = tx.gasPrice ? megaethAPI.weiToGwei(tx.gasPrice) : 0;
-                  
-                  const isIncoming = tx.to?.toLowerCase() === walletAddress.toLowerCase();
-                  const isContract = tx.to ? await megaethAPI.isContract(tx.to) : false;
-                  
-                  txHistory.push({
-                    hash: tx.hash,
-                    blockNumber: parseInt(tx.blockNumber, 16),
-                    type: isContract ? "contract" : (isIncoming ? "incoming" : "outgoing"),
-                    amount: valueEth.toFixed(6),
-                    amountUSD: (valueEth * 2500).toFixed(2),
-                    timestamp: new Date(parseInt(block.timestamp, 16) * 1000),
-                    status: "success",
-                    gasUsed: tx.gas || "21000",
-                    gasPrice: gasPrice.toFixed(2),
-                    from: tx.from || "",
-                    to: tx.to || "",
-                    value: valueEth.toString(),
-                    isContract
-                  });
-                }
-              } catch (txError) {
-                console.error(`Error fetching transaction ${j} from block ${blockNumber}:`, txError);
-              }
-            }
+      for (const block of blocks) {
+        if (!block || !block.transactions) continue;
+        for (const tx of block.transactions) {
+          if (!tx) continue;
+          if (
+            (tx.from && tx.from.toLowerCase() === walletAddress.toLowerCase()) ||
+            (tx.to && tx.to.toLowerCase() === walletAddress.toLowerCase())
+          ) {
+            const valueEth = tx.value ? megaethAPI.weiToEther(tx.value) : 0;
+            const gasPrice = tx.gasPrice ? megaethAPI.weiToGwei(tx.gasPrice) : 0;
+            const isIncoming = tx.to?.toLowerCase() === walletAddress.toLowerCase();
+            // No contract detection for speed
+            txHistory.push({
+              hash: tx.hash,
+              blockNumber: block.number,
+              type: isIncoming ? "incoming" : "outgoing",
+              amount: valueEth.toFixed(6),
+              amountUSD: (valueEth * 2500).toFixed(2),
+              timestamp: new Date(typeof block.timestamp === 'string' ? parseInt(block.timestamp, 16) * 1000 : block.timestamp * 1000),
+              status: "success",
+              gasUsed: tx.gas || "21000",
+              gasPrice: gasPrice.toFixed(2),
+              from: tx.from || "",
+              to: tx.to || "",
+              value: valueEth.toString(),
+              isContract: false
+            });
           }
-        } catch (blockError) {
-          console.error(`Error fetching block ${latestBlock - i}:`, blockError);
         }
       }
-      
-      // If no real transactions found, show a message but don't use mock data
-      if (txHistory.length === 0) {
-        console.log('No recent transactions found for this address');
-      }
-      
       // Sort by timestamp descending
       txHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-      
       setTransactions(txHistory);
-      console.log('Found transactions:', txHistory.length);
-      
     } catch (error) {
-      console.error('Error fetching transaction history:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch transaction history');
       toast.error('Failed to fetch transaction history');
     } finally {

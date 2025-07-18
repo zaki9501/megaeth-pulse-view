@@ -5,8 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Hash, ArrowRight, Zap, Clock, CheckCircle, XCircle, Loader } from "lucide-react";
 import { megaethAPI } from "@/services/megaethApi";
-import { Header } from "@/components/dashboard/Header";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 
 interface TransactionData {
   hash: string;
@@ -30,7 +28,6 @@ const TransactionDetails = () => {
   const [txData, setTxData] = useState<TransactionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (hash) {
@@ -40,29 +37,21 @@ const TransactionDetails = () => {
 
   const fetchTransactionData = async () => {
     if (!hash) return;
-    
     setIsLoading(true);
     setError(null);
-    
     try {
       const tx = await megaethAPI.getTransactionByHash(hash);
       const receipt = await megaethAPI.getTransactionReceipt(hash);
-      
       if (!tx) {
         throw new Error('Transaction not found');
       }
-
-      // Get block to fetch timestamp
       let timestamp = Date.now();
       if (tx.blockNumber) {
         try {
           const block = await megaethAPI.getBlock(parseInt(tx.blockNumber, 16));
           timestamp = parseInt(block.timestamp, 16) * 1000;
-        } catch (error) {
-          // Use current time if block fetch fails
-        }
+        } catch (error) {}
       }
-
       setTxData({
         hash: tx.hash,
         from: tx.from || '',
@@ -114,10 +103,6 @@ const TransactionDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-        <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
-          <Header />
           <main className="p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -126,33 +111,21 @@ const TransactionDetails = () => {
               </div>
             </div>
           </main>
-        </div>
-      </div>
     );
   }
 
   if (error || !txData) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-        <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
-          <Header />
           <main className="p-6">
             <div className="text-center text-red-400/80">
               <h2 className="text-xl font-bold mb-2">Error</h2>
               <p>{error || 'Transaction not found'}</p>
             </div>
           </main>
-        </div>
-      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Sidebar activeTab="" setActiveTab={() => {}} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-      <div className={`transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-64"}`}>
-        <Header />
         <main className="p-6 space-y-6">
           {/* Transaction Header */}
           <div className="flex items-center justify-between">
@@ -288,8 +261,6 @@ const TransactionDetails = () => {
             </CardContent>
           </Card>
         </main>
-      </div>
-    </div>
   );
 };
 

@@ -112,6 +112,10 @@ class MegaETHAPI {
     return code !== '0x' && code.length > 2;
   }
 
+  async getBlockByHash(blockHash: string): Promise<any> {
+    return await this.makeRPCCall('eth_getBlockByHash', [blockHash, false]);
+  }
+
   // Helper method to convert Wei to Ether
   weiToEther(wei: string): number {
     return parseInt(wei, 16) / Math.pow(10, 18);

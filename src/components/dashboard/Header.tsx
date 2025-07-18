@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { megaethAPI } from "@/services/megaethApi";
 
 export const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,14 +20,28 @@ export const Header = () => {
     try {
       if (query.startsWith('0x')) {
         if (query.length === 42) {
+          // Address
           navigate(`/address/${query}`);
         } else if (query.length === 66) {
-          navigate(`/transaction/${query}`);
+          // Try block first
+          const block = await megaethAPI.getBlockByHash(query);
+          if (block) {
+            navigate(`/block/${query}`);
+          } else {
+            // Try transaction
+            const tx = await megaethAPI.getTransactionByHash(query);
+            if (tx) {
+              navigate(`/transaction/${query}`);
+            } else {
+              toast.error("Not found: No block or transaction with this hash");
+            }
+          }
         } else {
-          toast.error("Invalid address or transaction hash format");
+          toast.error("Invalid address, transaction hash, or block hash format");
         }
-      } else {
-        toast.error("Please enter a valid wallet address (0x...) or transaction hash");
+      } else if (/^\d+$/.test(query)) {
+        // Block number
+        navigate(`/block/${query}`);
       }
     } catch (error) {
       toast.error("Search failed. Please try again.");
@@ -83,7 +98,7 @@ export const Header = () => {
           <div className="flex items-center justify-between sm:justify-start space-x-4">
             <div className="flex items-center space-x-2 professional-card px-4 py-2 professional-border">
               <Globe size={16} className="text-primary" />
-              <span className="text-sm font-medium text-foreground">Mainnet</span>
+              <span className="text-sm font-medium text-foreground">Testnet</span>
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             </div>
             

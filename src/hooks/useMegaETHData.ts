@@ -39,9 +39,22 @@ export const useMegaETHData = () => {
       // Fetch current block number
       const currentBlock = await megaethAPI.getBlockNumber();
       
-      // Fetch current gas price
+      // Fetch real-time gas estimate for a standard transfer
+      let gasEstimateGwei = 0;
+      try {
+        // Standard transfer transaction (from: zero address, to: zero address, value: 1 wei)
+        const tx = {
+          from: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e', // Valid public address
+          to: '0x0000000000000000000000000000000000000000',
+          value: '0x1'
+        };
+        const gasEstimateHex = await megaethAPI.estimateGas(tx);
+        gasEstimateGwei = megaethAPI.weiToGwei(gasEstimateHex);
+      } catch (e) {
+        // Fallback to gasPrice if estimateGas fails
       const gasPriceWei = await megaethAPI.getGasPrice();
-      const gasPriceGwei = megaethAPI.weiToGwei(gasPriceWei);
+        gasEstimateGwei = megaethAPI.weiToGwei(gasPriceWei);
+      }
       
       // Fetch latest block details (without full transaction details)
       const latestBlock = await megaethAPI.getBlock('latest');
@@ -59,7 +72,7 @@ export const useMegaETHData = () => {
       setChainMetrics({
         blockHeight: currentBlock,
         blockTime: blockTime || 50, // Default to 50ms if no previous data
-        gasPrice: gasPriceGwei,
+        gasPrice: gasEstimateGwei,
         tps: transactionCount, // This represents transactions per block, not per second
         lastUpdated: new Date()
       });

@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Wallet, Activity, Copy, ExternalLink } from "lucide-react";
-import { WalletSearch } from "./WalletSearch";
+import { TrendingUp, Wallet, Activity, Copy, ExternalLink } from "lucide-react";
 import { TransactionHistory } from "./TransactionHistory";
 import { megaethAPI } from "@/services/megaethApi";
 import { toast } from "sonner";
@@ -21,41 +20,50 @@ interface WalletData {
   firstSeen: Date | null;
 }
 
-export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfolioProps) => {
-  const [walletAddress, setWalletAddress] = useState(initialAddress || "");
+const INDEXER_BLOCK_API = "https://jiti.indexing.co/networks/MEGAETH_TESTNET";
+
+export const WalletPortfolio = ({ walletAddress }: WalletPortfolioProps) => {
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (walletAddress) {
-      fetchWalletData();
+      fetchWalletData(walletAddress);
     }
   }, [walletAddress]);
 
-  const fetchWalletData = async () => {
-    if (!walletAddress) return;
-    
+  const fetchWalletData = async (address: string) => {
+    if (!address) return;
     setIsLoading(true);
     setError(null);
-    
     try {
-      console.log('Fetching wallet data for:', walletAddress);
-      
-      // Fetch basic wallet information
-      const [balance, txCount, isContract] = await Promise.all([
-        megaethAPI.getBalance(walletAddress),
-        megaethAPI.getTransactionCount(walletAddress),
-        megaethAPI.isContract(walletAddress)
+      const [balance, isContract, latestBlock] = await Promise.all([
+        megaethAPI.getBalance(address),
+        megaethAPI.isContract(address),
+        megaethAPI.getBlockNumber()
       ]);
-
       const balanceEth = megaethAPI.weiToEther(balance);
-      const balanceUSD = balanceEth * 2500; // Approximate ETH price
-      
-      console.log('Wallet data fetched:', { balance: balanceEth, txCount, isContract });
-      
+      const balanceUSD = balanceEth * 2500;
+      // Scan last 100 blocks for transactions involving this address
+      const blockNumbers = Array.from({ length: 100 }, (_, i) => latestBlock - i);
+      const blockPromises = blockNumbers.map(num => fetch(`${INDEXER_BLOCK_API}/${num}`).then(r => r.ok ? r.json() : null).catch(() => null));
+      const blocks = await Promise.all(blockPromises);
+      let txCount = 0;
+      for (const block of blocks) {
+        if (!block || !block.transactions) continue;
+        for (const tx of block.transactions) {
+          if (!tx) continue;
+          if (
+            (tx.from && tx.from.toLowerCase() === address.toLowerCase()) ||
+            (tx.to && tx.to.toLowerCase() === address.toLowerCase())
+          ) {
+            txCount++;
+          }
+        }
+      }
       setWalletData({
-        address: walletAddress,
+        address,
         balance: balanceEth,
         balanceUSD,
         transactionCount: txCount,
@@ -64,7 +72,6 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
         firstSeen: txCount > 0 ? new Date(Date.now() - (txCount * 24 * 60 * 60 * 1000)) : null
       });
     } catch (error) {
-      console.error('Error fetching wallet data:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch wallet data');
       toast.error('Failed to fetch wallet data');
     } finally {
@@ -73,19 +80,26 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
   };
 
   const copyAddress = () => {
+    if (walletAddress) {
     navigator.clipboard.writeText(walletAddress);
     toast.success('Address copied to clipboard');
+    }
   };
 
   const openInExplorer = () => {
+    if (walletAddress) {
     window.open(`https://explorer.megaeth.com/address/${walletAddress}`, '_blank');
+    }
   };
 
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent mb-2">Portfolio Analysis</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent mb-2">
+            Portfolio Analysis
+          </h2>
           <p className="text-green-400/70">Real-time wallet analysis powered by MegaETH</p>
         </div>
         <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 neon-glow">
@@ -94,11 +108,7 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
         </Badge>
       </div>
 
-      <WalletSearch 
-        onWalletSelect={setWalletAddress} 
-        selectedWallet={walletAddress}
-      />
-
+      {/* Error State */}
       {error && (
         <Card className="glass-morphism border-red-500/50 bg-red-900/20 neon-glow">
           <CardContent className="p-6">
@@ -110,43 +120,42 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
         </Card>
       )}
 
+      {/* Wallet Info */}
       {walletData && (
         <>
-          {/* Wallet Header */}
-          <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-gray-800/50 to-gray-900/50">
+          <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-gray-800/60 to-gray-900/60">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-6">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center neon-glow">
-                    <Wallet className="w-6 h-6 text-white" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-green-500/80 to-emerald-500/80 rounded-xl flex items-center justify-center neon-glow">
+                    <Wallet className="w-7 h-7 text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-green-100">
                       {walletData.isContract ? 'Smart Contract' : 'Wallet Address'}
                     </h3>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono text-green-400/70 text-sm">
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="font-mono text-green-400/80 text-base">
                         {walletData.address.slice(0, 10)}...{walletData.address.slice(-8)}
                       </span>
-                      <button onClick={copyAddress} className="text-green-400/70 hover:text-green-300 transition-colors">
+                      <button onClick={copyAddress} className="text-green-400/80 hover:text-green-300 transition-colors">
                         <Copy className="w-4 h-4" />
                       </button>
-                      <button onClick={openInExplorer} className="text-green-400/70 hover:text-green-300 transition-colors">
+                      <button onClick={openInExplorer} className="text-green-400/80 hover:text-green-300 transition-colors">
                         <ExternalLink className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-green-100">
-                    {walletData.balance.toFixed(6)} ETH
+                  <div className="text-3xl font-bold text-green-100">
+                    {walletData.balance.toFixed(6)} <span className="text-green-400">ETH</span>
                   </div>
-                  <div className="text-green-400/70">
+                  <div className="text-green-400/70 text-lg">
                     ≈ ${walletData.balanceUSD.toFixed(2)} USD
                   </div>
                 </div>
               </div>
-              
               {walletData.lastActivity && (
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-green-500/20">
                   <div>
@@ -164,7 +173,7 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-blue-900/30 to-blue-800/20">
+            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-blue-900/40 to-blue-800/30">
               <CardHeader className="pb-2">
                 <CardTitle className="text-blue-400 text-sm font-medium flex items-center">
                   <Wallet className="w-4 h-4 mr-2" />
@@ -182,7 +191,7 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-purple-900/30 to-purple-800/20">
+            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-purple-900/40 to-purple-800/30">
               <CardHeader className="pb-2">
                 <CardTitle className="text-purple-400 text-sm font-medium flex items-center">
                   <Activity className="w-4 h-4 mr-2" />
@@ -197,7 +206,7 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-green-900/30 to-green-800/20">
+            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-green-900/40 to-green-800/30">
               <CardHeader className="pb-2">
                 <CardTitle className="text-green-400 text-sm font-medium">Account Type</CardTitle>
               </CardHeader>
@@ -211,7 +220,7 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
               </CardContent>
             </Card>
 
-            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-orange-900/30 to-orange-800/20">
+            <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-orange-900/40 to-orange-800/30">
               <CardHeader className="pb-2">
                 <CardTitle className="text-orange-400 text-sm font-medium">Activity Score</CardTitle>
               </CardHeader>
@@ -224,10 +233,12 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
             </Card>
           </div>
 
-          <TransactionHistory walletAddress={walletAddress} />
+          {/* Transaction History */}
+          <TransactionHistory walletAddress={walletData.address} />
         </>
       )}
 
+      {/* Loading State */}
       {isLoading && (
         <div className="space-y-6">
           <Card className="glass-morphism cyber-border neon-glow">
@@ -246,9 +257,10 @@ export const WalletPortfolio = ({ walletAddress: initialAddress }: WalletPortfol
         </div>
       )}
 
+      {/* Empty State */}
       {!walletAddress && !isLoading && (
         <div className="space-y-6">
-          <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-gray-800/50 to-gray-900/50">
+          <Card className="glass-morphism cyber-border neon-glow bg-gradient-to-br from-gray-800/60 to-gray-900/60">
             <CardContent className="p-16 text-center">
               <div className="relative mb-8">
                 <div className="absolute inset-0 bg-green-500/10 rounded-full blur-3xl"></div>

@@ -1,92 +1,60 @@
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Zap, Users, Activity } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Zap } from "lucide-react";
 
 export const DAppLeaderboard = () => {
   const timeRanges = ["24h", "7d", "30d"];
   const categories = ["All", "DeFi", "Gaming", "NFT", "Infra"];
   
-  const dapps = [
-    {
-      rank: 1,
-      name: "Whoadwap",
-      category: "DeFi",
-      gasUsed: "2900 METH",
-      uniqueUsers: "192 METH",
-      volume: "192 METH",
-      trend: "up",
-      status: "🔥",
-      avatar: "🟢"
-    },
-    {
-      rank: 2,
-      name: "MegaLost",
-      category: "Gaming",
-      gasUsed: "530 MTH",
-      uniqueUsers: "565 MTH",
-      volume: "565 MTH", 
-      trend: "up",
-      status: "🔥",
-      avatar: "🔵"
-    },
-    {
-      rank: 3,
-      name: "MegaLend",
-      category: "DeFi",
-      gasUsed: "182 Usd",
-      uniqueUsers: "382 Volume",
-      volume: "382 Volume",
-      trend: "up",
-      status: "",
-      avatar: "🟡"
-    },
-    {
-      rank: 4,
-      name: "PlasiPets",
-      category: "NFT",
-      gasUsed: "5736",
-      uniqueUsers: "223 Volume",
-      volume: "223 Volume",
-      trend: "down",
-      status: "",
-      avatar: "🔵"
-    },
-    {
-      rank: 5,
-      name: "EthMail",
-      category: "Infra",
-      gasUsed: "2360",
-      uniqueUsers: "165 Volume",
-      volume: "165 Volume",
-      trend: "up",
-      status: "",
-      avatar: "⚫"
-    },
-    {
-      rank: 6,
-      name: "MegaBridge",
-      category: "Infra",
-      gasUsed: "200M",
-      uniqueUsers: "146 Volume",
-      volume: "146 Volume",
-      trend: "up",
-      status: "",
-      avatar: "🔵"
-    },
-    {
-      rank: 7,
-      name: "Chartvide",
-      category: "DeFi",
-      gasUsed: "128.0",
-      uniqueUsers: "1/0 Sparkling",
-      volume: "1/0 Sparkling",
-      trend: "up",
-      status: "🆕",
-      avatar: "🔵"
-    }
-  ];
+  const [topContracts, setTopContracts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTopContracts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Get the latest block number from the indexer
+        const latestBlockRes = await fetch("https://jiti.indexing.co/networks/MEGAETH_TESTNET/latest");
+        const latestBlockData = await latestBlockRes.json();
+        const latestBlock = latestBlockData.number;
+        const numBlocks = 20;
+        const contractStats: Record<string, { count: number; lastSeen: number }> = {};
+        // Scan last N blocks
+        for (let i = 0; i < numBlocks; i++) {
+          const blockNum = latestBlock - i;
+          const res = await fetch(`https://jiti.indexing.co/networks/MEGAETH_TESTNET/${blockNum}`);
+          if (!res.ok) continue;
+          const block = await res.json();
+          if (block && block.transactions) {
+            for (const tx of block.transactions) {
+              if (tx.to) {
+                if (!contractStats[tx.to]) {
+                  contractStats[tx.to] = { count: 0, lastSeen: blockNum };
+                }
+                contractStats[tx.to].count++;
+                contractStats[tx.to].lastSeen = Math.max(contractStats[tx.to].lastSeen, blockNum);
+              }
+            }
+          }
+        }
+        // Convert to array and sort by count desc
+        const sorted = Object.entries(contractStats)
+          .map(([address, stats]) => ({ address, ...stats }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+        setTopContracts(sorted);
+      } catch (e: any) {
+        setError(e.message || "Failed to load leaderboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTopContracts();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -103,6 +71,7 @@ export const DAppLeaderboard = () => {
                 variant="outline" 
                 size="sm" 
                 className="professional-button-secondary hover:bg-primary/10"
+                disabled
               >
                 {range}
               </Button>
@@ -122,6 +91,7 @@ export const DAppLeaderboard = () => {
               "professional-button" : 
               "professional-button-secondary hover:bg-primary/10"
             }
+            disabled
           >
             {category}
           </Button>
@@ -132,41 +102,44 @@ export const DAppLeaderboard = () => {
       <Card className="professional-card professional-shadow">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-foreground">
-            <span>Top dApps</span>
+            <span>Top Contracts (last 20 blocks)</span>
             <div className="flex space-x-4 text-sm text-muted-foreground">
-              <span>Gas Use (24h)</span>
-              <span>Unique Users</span>
-              <span>Volume</span>
+              <span>Tx Count</span>
+              <span>Address</span>
+              <span>Last Seen</span>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {loading ? (
+            <div className="p-6 text-center text-muted-foreground">Loading...</div>
+          ) : error ? (
+            <div className="p-6 text-center text-red-400">{error}</div>
+          ) : (
           <div className="space-y-1">
-            {dapps.map((dapp, index) => (
-              <div key={index} className="flex items-center justify-between p-4 hover:bg-accent/50 rounded-lg transition-all duration-200 group border border-border/50 hover:border-primary/20">
+              {topContracts.map((contract, index) => (
+                <div key={contract.address} className="flex items-center justify-between p-4 hover:bg-accent/50 rounded-lg transition-all duration-200 group border border-border/50 hover:border-primary/20">
                 <div className="flex items-center space-x-4">
-                  <span className="text-muted-foreground text-sm w-6 font-medium">{dapp.rank}</span>
+                    <span className="text-muted-foreground text-sm w-6 font-medium">{index + 1}</span>
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm border border-primary/20">
-                    {dapp.avatar}
+                      <Zap className="text-green-400" size={18} />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium text-foreground group-hover:text-primary transition-colors">{dapp.name}</span>
-                      {dapp.status && <span>{dapp.status}</span>}
+                        <span className="font-medium text-foreground group-hover:text-primary transition-colors">{contract.address.slice(0, 8)}...{contract.address.slice(-6)}</span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">Contract</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{dapp.category}</span>
                   </div>
-                </div>
-                
                 <div className="flex items-center space-x-8">
                   <div className="text-right">
-                    <div className="font-medium text-foreground">{dapp.gasUsed}</div>
+                      <div className="font-medium text-foreground">{contract.count}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-foreground">{dapp.uniqueUsers}</div>
+                      <div className="font-mono text-foreground">{contract.address.slice(0, 6)}...{contract.address.slice(-4)}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-foreground">{dapp.volume}</div>
+                      <div className="text-muted-foreground">#{contract.lastSeen}</div>
                   </div>
                   <div className="w-16 h-8 bg-secondary rounded flex items-center justify-center border border-border">
                     <div className="w-12 h-2 bg-primary rounded"></div>
@@ -175,6 +148,7 @@ export const DAppLeaderboard = () => {
               </div>
             ))}
           </div>
+          )}
         </CardContent>
       </Card>
     </div>

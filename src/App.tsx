@@ -14,6 +14,7 @@ import Visualizer from "./pages/Visualizer";
 import AddressDetails from "./pages/AddressDetails";
 import TransactionDetails from "./pages/TransactionDetails";
 import NotFound from "./pages/NotFound";
+import BlockDetails from "./pages/BlockDetails";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => {
                         <Route path="/visualizer" element={<Visualizer />} />
                         <Route path="/address/:address" element={<AddressDetails />} />
                         <Route path="/transaction/:hash" element={<TransactionDetails />} />
+                        <Route path="/block/:blockHashOrNumber" element={<BlockDetails />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
