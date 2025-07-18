@@ -42,50 +42,6 @@ const Portfolio = () => {
             </Badge>
           </div>
 
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="professional-card bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-primary/10 rounded-lg">
-                    <Wallet className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Active Wallets</p>
-                    <p className="text-2xl font-bold text-foreground">1,247</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="professional-card bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-accent/10 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Volume</p>
-                    <p className="text-2xl font-bold text-foreground">$2.4M</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="professional-card bg-gradient-to-br from-muted/5 to-accent/5 border-muted/20">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-muted/10 rounded-lg">
-                    <Clock className="w-6 h-6 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Transactions</p>
-                    <p className="text-2xl font-bold text-foreground">89,432</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Wallet Search */}

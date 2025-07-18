@@ -28,25 +28,25 @@ export const WalletSearch = ({ onWalletSelect, selectedWallet }: WalletSearchPro
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700">
+    <Card className="professional-card">
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Search Input */}
           <div className="flex space-x-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
               <input
                 type="text"
                 placeholder="Enter wallet address (0x...)"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <button
               onClick={handleSearch}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
             >
               Search
             </button>
@@ -54,10 +54,10 @@ export const WalletSearch = ({ onWalletSelect, selectedWallet }: WalletSearchPro
 
           {/* Current Selection */}
           {selectedWallet && (
-            <div className="flex items-center space-x-2 p-3 bg-gray-700 rounded-lg">
-              <Wallet className="text-blue-400" size={20} />
-              <span className="text-sm text-gray-300">Current:</span>
-              <span className="font-mono text-blue-400 text-sm">
+            <div className="flex items-center space-x-2 p-3 bg-accent/10 rounded-lg border border-accent/20">
+              <Wallet className="text-primary" size={20} />
+              <span className="text-sm text-muted-foreground">Current:</span>
+              <span className="font-mono text-foreground text-sm">
                 {selectedWallet.slice(0, 10)}...{selectedWallet.slice(-8)}
               </span>
             </div>
@@ -66,18 +66,18 @@ export const WalletSearch = ({ onWalletSelect, selectedWallet }: WalletSearchPro
           {/* Recent Wallets */}
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <History className="text-gray-400" size={16} />
-              <span className="text-sm text-gray-400">Recent Searches</span>
+              <History className="text-muted-foreground" size={16} />
+              <span className="text-sm text-muted-foreground">Recent Searches</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {recentWallets.map((wallet, index) => (
                 <button
                   key={index}
                   onClick={() => handleRecentWalletClick(wallet.address)}
-                  className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors"
+                  className="p-3 bg-accent/5 hover:bg-accent/10 border border-border rounded-lg text-left transition-colors"
                 >
-                  <div className="text-sm font-medium text-white">{wallet.label}</div>
-                  <div className="text-xs text-gray-400 font-mono">
+                  <div className="text-sm font-medium text-foreground">{wallet.label}</div>
+                  <div className="text-xs text-muted-foreground font-mono">
                     {wallet.address.slice(0, 10)}...{wallet.address.slice(-8)}
                   </div>
                 </button>
